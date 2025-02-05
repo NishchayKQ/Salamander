@@ -13,7 +13,9 @@ object AppViewModelProvider {
             SalamanderViewModel()
         }
         initializer {
-            TaskViewModel(salamanderApplication().container.taskRepository)
+            TaskViewModel(
+//                salamanderApplication().container.taskRepository
+            )
         }
     }
 }

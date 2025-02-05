@@ -3,11 +3,9 @@ package nish.wry.salamander.ui.task
 import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,43 +18,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
-import nish.wry.salamander.R
 import nish.wry.salamander.data.Constants
-import nish.wry.salamander.ui.AppViewModelProvider
-import nish.wry.salamander.ui.navigation.NavigationDestination
-import nish.wry.salamander.ui.navigation.Routes
 import java.util.Calendar
 
-object TaskDestination : NavigationDestination {
-    override val route = Routes.Task
-    override val titleRes: Int = R.string.task
-    override val icon = R.drawable.outline_checklist_24
-}
-
-@Composable
-fun TaskScreen(
-    viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    modifier: Modifier = Modifier,
-) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Timeline(
-            uiState = uiState,
-            updateScaleAndOffset = viewModel::updateZoomAndScroll
-        )
-    }
-}
-
+// TODO implement listener for fling scroll motion
 @Composable
 fun Timeline(
-    uiState: TaskUiState,
+    uiState: TimelineUiState,
     updateScaleAndOffset: (scale: Float, offsetY: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,7 +39,7 @@ fun Timeline(
     var currentTime by rememberSaveable { mutableStateOf(Calendar.getInstance()) }
 
     LaunchedEffect(Unit) {
-        while (true){
+        while (true) {
             delay(60_000)
             currentTime = Calendar.getInstance()
         }
@@ -142,10 +112,4 @@ fun Timeline(
 
     }
 
-}
-
-@Preview
-@Composable
-fun TaskScreenPreview() {
-    TaskScreen()
 }

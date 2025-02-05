@@ -4,24 +4,45 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import nish.wry.salamander.di.TaskRepository
 
-class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
+class TaskViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(TaskUiState())
-    val uiState = _uiState.asStateFlow()
+    // timeline stuff
+    private val _timelineUiState = MutableStateFlow(TimelineUiState())
+    val timelineUiState = _timelineUiState.asStateFlow()
 
     fun updateZoomAndScroll(newScale: Float, newOffsetY: Float) {
-        _uiState.update {
-            TaskUiState(scale = newScale, scrollOffset = newOffsetY)
+        _timelineUiState.update {
+            TimelineUiState(scale = newScale, scrollOffset = newOffsetY)
         }
+    }
 
+    // searchbar stuff
+    private val _searchUiState = MutableStateFlow(SearchBarUiState())
+
+    val searchUiState = _searchUiState.asStateFlow()
+
+    fun setSearchExpandedState(value: Boolean) {
+        _searchUiState.update { cur ->
+            cur.copy(expanded = value)
+        }
+    }
+
+    fun updateSearchQuery(query: String) {
+        _searchUiState.update { cur ->
+            cur.copy(query = query)
+        }
     }
 
 
 }
 
-data class TaskUiState(
+data class TimelineUiState(
     val scale: Float = 1f,
     val scrollOffset: Float = 0f,
+)
+
+data class SearchBarUiState(
+    val query: String = "",
+    val expanded: Boolean = false,
 )

@@ -1,9 +1,7 @@
 package nish.wry.salamander.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -38,20 +36,12 @@ fun SalamanderApp(
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            when (viewModel.currentDestination) {
-                SuBaseDestination -> {}
-                TaskDestination -> {
-                    TaskScreen(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding))
-                }
 
-                NishchayDestination -> {}
-            }
-
+        when (viewModel.currentDestination) {
+            SuBaseDestination -> {}
+            TaskDestination -> { TaskScreen(modifier = Modifier.fillMaxSize()) }
+            NishchayDestination -> {}
         }
-
 
     }
 }
