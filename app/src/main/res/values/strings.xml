@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Salamander</string>
+    <string name="water">Water</string>
+    <string name="todo">todo</string>
+    <string name="mark">mark</string>
+    <string name="interaction">interaction</string>
+    <string name="subase">suBase</string>
+    <string name="task">Task</string>
+    <string name="nishchay">Nishchay</string>
+</resources>
