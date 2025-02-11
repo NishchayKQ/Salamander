@@ -17,7 +17,6 @@ import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
 import nish.wry.salamander.data.room.Chip
-import nish.wry.salamander.data.room.toChipUiState
 import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import java.util.Calendar
@@ -39,7 +38,7 @@ class CreateChipViewModel(
             viewModelScope.launch {
                 val fetchedChipUiState = repository.getChipWithId(chipId).first().toChipUiState()
                 _chipUiState.update { fetchedChipUiState }
-                _uiState.update { UiState(floatingOffsetString = fetchedChipUiState.offsetHours.toString()) }
+                _uiState.update { UiState(offsetHoursString = fetchedChipUiState.offsetHours.toString()) }
             }
         }
     }
@@ -47,7 +46,7 @@ class CreateChipViewModel(
     private val _chipUiState = MutableSaveStateFlow(
         savedStateHandle = savedStateHandle,
         key = CHIP_UI_STATE_KEY,
-        defaultValue = ChipUiState()
+        defaultValue = ChipOrTaskUiState()
     )
 
 
@@ -63,7 +62,7 @@ class CreateChipViewModel(
 
     fun onChipNameChange(query: String) {
         _chipUiState.update { cur ->
-            cur.copy(name = query, isInputValid = query.isNotBlank())
+            cur.copy(name = query, isEntryValid = query.isNotBlank())
         }
     }
 
@@ -84,7 +83,7 @@ class CreateChipViewModel(
         if ((number != null && number in 1..23) || inputString.isBlank()) {
             _uiState.update { cur ->
                 cur.copy(
-                    floatingOffsetString = inputString
+                    offsetHoursString = inputString
                 )
             }
             if (number != null) {
@@ -136,14 +135,14 @@ class CreateChipViewModel(
         }
     }
 
-    suspend fun saveCreatedChip(uiState: ChipUiState = chipUiState.value) {
+    suspend fun saveCreatedChip(uiState: ChipOrTaskUiState = chipUiState.value) {
         if (uiState.name.isNotBlank()) {
             if (chipId != null) {
                 repository.updateChip(chipUiState.value.toChip())
             } else {
                 repository.createChip(chipUiState.value.toChip())
             }
-            _chipUiState.update { ChipUiState() }
+            _chipUiState.update { ChipOrTaskUiState() }
             _uiState.update { UiState() }
         }
     }
@@ -157,27 +156,27 @@ class CreateChipViewModel(
 }
 
 @Parcelize
-data class ChipUiState(
-    val chipId: Int = 0,
+data class ChipOrTaskUiState(
+    val chipId: Int? = null,
     val name: String = "",
     val selectedTime: Calendar = Calendar.getInstance(),
     val selectedWeekDaysBitmask: Int = 0,
     val priority: Priority = Priority.Normal,
     val timeless: Boolean = false,
     val offsetHours: Int = 1,
-    val isInputValid: Boolean = false,
+    val isEntryValid: Boolean = false,
 ) : Parcelable
 
 @Parcelize
 data class UiState(
     val showTimePicker: Boolean = false,
     val fastTimeIoInput: String = "",
-    val floatingOffsetString: String = "1",
+    val offsetHoursString: String = "1",
 ) : Parcelable
 
-fun ChipUiState.toChip(): Chip {
+fun ChipOrTaskUiState.toChip(): Chip {
     return Chip(
-        id = chipId,
+        id = chipId ?: 0,
         name = name,
         repeatOnDaysBitFlag = if (!timeless) selectedWeekDaysBitmask else 0,
         dateTime = if (!timeless) selectedTime else null,
@@ -185,3 +184,15 @@ fun ChipUiState.toChip(): Chip {
         priority = priority
     )
 }
+
+fun Chip.toChipUiState(): ChipOrTaskUiState =
+    ChipOrTaskUiState(
+        chipId = id,
+        name = name,
+        selectedTime = dateTime ?: Calendar.getInstance(),
+        selectedWeekDaysBitmask = repeatOnDaysBitFlag,
+        priority = priority,
+        timeless = dateTime == null,
+        offsetHours = floatingOffsetHours ?: 0,
+        isEntryValid = false
+    )

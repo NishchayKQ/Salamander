@@ -1,13 +1,11 @@
 package nish.wry.salamander.ui.task.create
 
-import android.os.Parcelable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.parcelize.Parcelize
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
@@ -16,6 +14,8 @@ import nish.wry.salamander.data.room.Chip
 import nish.wry.salamander.data.room.Task
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
+import nish.wry.salamander.ui.chip.create.ChipOrTaskUiState
+import nish.wry.salamander.ui.chip.create.UiState
 import java.util.Calendar
 
 class CreateTaskViewModel(
@@ -31,7 +31,7 @@ class CreateTaskViewModel(
         MutableSaveStateFlow(
             savedStateHandle = savedStateHandle,
             key = TASK_UI_STATE_KEY,
-            defaultValue = TaskUiState()
+            defaultValue = ChipOrTaskUiState()
         )
     val taskUiState = _taskUiStateUiState.asStateFlow()
 
@@ -55,14 +55,14 @@ class CreateTaskViewModel(
 
     fun onChipSelected(chipId: Int) {
         _taskUiStateUiState.update { cur ->
-            cur.copy(chipId = chipId)
+            cur.copy(chipId = chipId, isEntryValid = cur.name.isNotBlank())
         }
     }
 
     fun onTaskNameChange(query: String) {
         _taskUiStateUiState.update { cur ->
             cur.copy(
-                taskName = query, isTaskNameValid = query.isNotBlank()
+                name = query, isEntryValid = query.isNotBlank() && cur.chipId != null
             )
         }
     }
@@ -124,10 +124,10 @@ class CreateTaskViewModel(
         }
     }
 
-    suspend fun onSaveTaskClicked(uiState: TaskUiState = taskUiState.value) {
-        if (uiState.taskName.isNotBlank() && uiState.chipId != null) {
+    suspend fun onSaveTaskClicked(uiState: ChipOrTaskUiState = taskUiState.value) {
+        if (uiState.name.isNotBlank() && uiState.chipId != null) {
             repository.createTask(uiState.toTask())
-            _taskUiStateUiState.update { TaskUiState() }
+            _taskUiStateUiState.update { ChipOrTaskUiState() }
             _uiState.update { UiState() }
         }
     }
@@ -140,29 +140,10 @@ class CreateTaskViewModel(
 
 }
 
-@Parcelize
-data class TaskUiState(
-    val taskName: String = "",
-    val selectedTime: Calendar = Calendar.getInstance(),
-    val selectedWeekDaysBitmask: Int = 0,
-    val chipId: Int? = null,
-    val priority: Priority = Priority.Normal,
-    val timeless: Boolean = false,
-    val offsetHours: Int = 1,
-    val isTaskNameValid: Boolean = false,
-) : Parcelable
-
-@Parcelize
-data class UiState(
-    val fastTimeIoInput: String = "",
-    val showTimePicker: Boolean = false,
-    val offsetHoursString: String = "1",
-) : Parcelable
-
 // TODO we need some default chips that cant be deleted or something in db
-fun TaskUiState.toTask(): Task {
+fun ChipOrTaskUiState.toTask(): Task {
     return Task(
-        name = taskName,
+        name = name,
         repeatOnDaysBitFlag = if (!timeless) selectedWeekDaysBitmask else 0,
         dateTime = if (!timeless) selectedTime else null,
         floatingOffsetHours = if (timeless) offsetHours else null,

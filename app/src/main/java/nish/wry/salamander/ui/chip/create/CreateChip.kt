@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.ui.AppViewModelProvider
-import nish.wry.salamander.ui.chip.ChipEntryBody
+import nish.wry.salamander.ui.chip.ChipOrTaskEntryBody
 
 @Serializable
 object CreateChipDestination
@@ -23,10 +23,10 @@ fun CreateChip(
     val chipUiState by viewModel.chipUiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
-    ChipEntryBody(
-        chipUiState = chipUiState,
+    ChipOrTaskEntryBody(
+        chipOrTaskUiState = chipUiState,
         uiState = uiState,
-        onChipNameChange = viewModel::onChipNameChange,
+        onNameChange = viewModel::onChipNameChange,
         onSegmentedButtonPriorityClick = viewModel::onSegmentedButtonPriorityClick,
         onTimelessSwitchClick = viewModel::onTimelessSwitchClick,
         onOffsetTimeChange = viewModel::onOffsetTimeChange,
@@ -35,8 +35,8 @@ fun CreateChip(
         resetSelectedTimeToCurrentTime = viewModel::resetSelectedTimeToCurrentTime,
         setTime = viewModel::setTime,
         setOrResetBitFlagForWeekday = viewModel::setOrResetBitFlagForWeekday,
-        saveCreatedChip = viewModel::saveCreatedChip,
-        exitChip = exitChip,
+        saveData = viewModel::saveCreatedChip,
+        onExitRequested = exitChip,
         modifier = modifier
     )
 
