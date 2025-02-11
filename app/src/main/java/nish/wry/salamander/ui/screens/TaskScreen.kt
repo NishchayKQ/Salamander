@@ -11,19 +11,25 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
-import nish.wry.salamander.ui.chip.CreateChip
-import nish.wry.salamander.ui.navigation.NavigationDestination
-import nish.wry.salamander.ui.newTask.NewTask
+import nish.wry.salamander.ui.chip.create.CreateChip
+import nish.wry.salamander.ui.chip.edit.EditChip
+import nish.wry.salamander.ui.navigation.MainDestination
 import nish.wry.salamander.ui.task.TaskTimelineScreen
 import nish.wry.salamander.ui.task.TaskViewModel
+import nish.wry.salamander.ui.task.create.NewTask
 
 @Serializable
-object TaskDestination : NavigationDestination {
+@Parcelize
+object MainTaskDestination : MainDestination {
+    @IgnoredOnParcel
     override val titleRes: Int = R.string.task
+
+    @IgnoredOnParcel
     override val iconRes = R.drawable.outline_checklist_24
 }
 
@@ -51,16 +57,33 @@ fun TaskScreen() {
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                TaskTimelineScreen(onAddTaskClick = {
-                    navigator.navigateTo(
-                        InTaskDestination.CreateTask.role,
-                        InTaskDestination.CreateTask
-                    )
-                })
+                TaskTimelineScreen(
+                    onAddTaskClicked = {
+                        navigator.navigateTo(
+                            InTaskDestination.CreateTask.role,
+                            InTaskDestination.CreateTask
+                        )
+                    }, onEditChipClicked = { chipId ->
+                        val editTask = InTaskDestination.EditChip(chipId = chipId)
+                        navigator.navigateTo(
+                            pane = editTask.role,
+                            content = editTask
+                        )
+                    })
             }
         },
         detailPane = {
-            AnimatedPane { }
+            AnimatedPane {
+                navigator.currentDestination?.content?.let { inTaskDestination ->
+                    when (inTaskDestination) {
+                        is InTaskDestination.EditChip -> {
+                            EditChip()
+                        }
+
+                        else -> Unit
+                    }
+                }
+            }
         },
         extraPane = {
             AnimatedPane {
@@ -91,9 +114,7 @@ fun TaskScreen() {
                                 })
                         }
 
-                        else -> {
-
-                        }
+                        else -> Unit
                     }
                 }
             }

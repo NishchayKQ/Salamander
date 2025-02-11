@@ -12,7 +12,8 @@ import nish.wry.salamander.ui.AppViewModelProvider
 
 @Composable
 fun TaskTimelineScreen(
-    onAddTaskClick: () -> Unit,
+    onAddTaskClicked: () -> Unit,
+    onEditChipClicked: (Int) -> Unit,
     viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 ) {
@@ -25,6 +26,8 @@ fun TaskTimelineScreen(
             chips = chips,
             selectedChipIds = timelineUiState.selectedChipIDs,
             onChipClicked = viewModel::onChipClicked,
+            onEditChipClicked = onEditChipClicked,
+            onDeleteChipClicked = {},
             searchQuery = taskScreenUiState.query,
             expanded = taskScreenUiState.expanded,
             onExpandedChange = viewModel::setSearchExpandedState,
@@ -32,7 +35,7 @@ fun TaskTimelineScreen(
             onQueryChange = viewModel::updateSearchQuery
         )
     }, bottomBar = {
-        TaskBottomAppBar(onAddTaskClick = onAddTaskClick)
+        TaskBottomAppBar(onAddTaskClick = onAddTaskClicked)
     }, modifier = modifier.fillMaxSize()
     ) { innerPadding ->
 

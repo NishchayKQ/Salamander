@@ -1,22 +1,28 @@
 package nish.wry.salamander.ui.task
 
+import android.os.Parcelable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.parcelize.Parcelize
+import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.room.Chip
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
 
 class TaskViewModel(
+    savedStateHandle: SavedStateHandle,
     repository: TaskRepository,
     getAllChipsUseCase: GetAllChipsUseCase,
 ) : ViewModel() {
 
     // timeline stuff
-    private val _timelineUiState = MutableStateFlow(TimelineUiState())
+    private val _timelineUiState = MutableSaveStateFlow(
+        savedStateHandle = savedStateHandle,
+        key = TIMELINE_UI_STATE_KEY,
+        defaultValue = TimelineUiState()
+    )
     val timelineUiState = _timelineUiState.asStateFlow()
 
     fun updateZoomAndScroll(newScale: Float, newOffsetY: Float) {
@@ -26,7 +32,11 @@ class TaskViewModel(
     }
 
     // searchbar stuff
-    private val _taskScreenUiState = MutableStateFlow(TaskScreenUiState())
+    private val _taskScreenUiState = MutableSaveStateFlow(
+        savedStateHandle = savedStateHandle,
+        key = TASK_SCREEN_UI_STATE_KEY,
+        defaultValue = TaskScreenUiState()
+    )
 
     val taskScreenUiState = _taskScreenUiState.asStateFlow()
 
@@ -54,15 +64,22 @@ class TaskViewModel(
         }
     }
 
+    private companion object {
+        private const val TIMELINE_UI_STATE_KEY = "TIME_LINE_UI_STATE"
+        private const val TASK_SCREEN_UI_STATE_KEY = "TASK_SCREEN_UI_STATE"
+    }
+
 }
 
+@Parcelize
 data class TimelineUiState(
     val scale: Float = 1f,
     val scrollOffset: Float = 0f,
     val selectedChipIDs: Set<Int> = emptySet(),
-)
+) : Parcelable
 
+@Parcelize
 data class TaskScreenUiState(
     val query: String = "",
     val expanded: Boolean = false,
-)
+) : Parcelable

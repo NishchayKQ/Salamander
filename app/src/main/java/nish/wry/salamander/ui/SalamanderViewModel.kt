@@ -1,23 +1,35 @@
 package nish.wry.salamander.ui
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import nish.wry.salamander.ui.navigation.NavigationDestination
-import nish.wry.salamander.ui.screens.NishchayDestination
-import nish.wry.salamander.ui.screens.SuBaseDestination
-import nish.wry.salamander.ui.screens.TaskDestination
+import kotlinx.coroutines.flow.StateFlow
+import nish.wry.salamander.data.MutableSaveStateFlow
+import nish.wry.salamander.ui.navigation.MainDestination
+import nish.wry.salamander.ui.screens.MainNishchayDestination
+import nish.wry.salamander.ui.screens.MainSuBaseDestination
+import nish.wry.salamander.ui.screens.MainTaskDestination
 
-class SalamanderViewModel : ViewModel() {
+class SalamanderViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    val listOfDestination: List<NavigationDestination> = listOf(
-        SuBaseDestination,
-        TaskDestination,
-        NishchayDestination
+    val listOfDestination: List<MainDestination> = listOf(
+        MainSuBaseDestination, MainTaskDestination, MainNishchayDestination
+    )
+    private val _currentDestination = MutableSaveStateFlow(
+        savedStateHandle = savedStateHandle,
+        key = CURRENT_DESTINATION_KEY,
+        defaultValue = listOfDestination[1]
     )
 
+    val currentDestination: StateFlow<MainDestination> = _currentDestination.asStateFlow()
 
-    var currentDestination: NavigationDestination by mutableStateOf(listOfDestination[1])
+    fun setDestination(destination: MainDestination) {
+        _currentDestination.update {
+            destination
+        }
+    }
 
+
+    private companion object {
+        private const val CURRENT_DESTINATION_KEY = "CURRENT_DESTINATION"
+    }
 }

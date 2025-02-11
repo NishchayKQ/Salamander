@@ -1,13 +1,14 @@
-package nish.wry.salamander.ui.newTask
+package nish.wry.salamander.ui.task.create
 
+import android.os.Parcelable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.parcelize.Parcelize
+import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
@@ -18,6 +19,7 @@ import nish.wry.salamander.di.TaskRepository
 import java.util.Calendar
 
 class NewTaskViewModel(
+    savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
     getAllChipsUseCase: GetAllChipsUseCase,
 ) : ViewModel() {
@@ -25,11 +27,20 @@ class NewTaskViewModel(
 
     val chips: StateFlow<List<Chip>> = getAllChipsUseCase(viewModelScope)
 
-    private val _taskUiStateUiState = MutableStateFlow(TaskUiState())
+    private val _taskUiStateUiState =
+        MutableSaveStateFlow(
+            savedStateHandle = savedStateHandle,
+            key = TASK_UI_STATE_KEY,
+            defaultValue = TaskUiState()
+        )
     val taskUiState = _taskUiStateUiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.asStateFlow()
+    private val _uiState = MutableSaveStateFlow(
+        savedStateHandle = savedStateHandle,
+        key = UI_STATE_KEY,
+        defaultValue = UiState()
+    )
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
 
     fun setOrResetBitFlagForWeekday(boolean: Boolean, week: Week) {
@@ -121,9 +132,15 @@ class NewTaskViewModel(
         }
     }
 
+    private companion object {
+        private const val UI_STATE_KEY = "UI_STATE"
+        private const val TASK_UI_STATE_KEY = "TASK_UI_STATE"
+    }
+
 
 }
 
+@Parcelize
 data class TaskUiState(
     val taskName: String = "",
     val selectedTime: Calendar = Calendar.getInstance(),
@@ -133,13 +150,14 @@ data class TaskUiState(
     val timeless: Boolean = false,
     val offsetHours: Int = 1,
     val isTaskNameValid: Boolean = false,
-)
+) : Parcelable
 
+@Parcelize
 data class UiState(
     val fastTimeIoInput: String = "",
     val showTimePicker: Boolean = false,
     val offsetHoursString: String = "1",
-)
+) : Parcelable
 
 // TODO we need some default chips that cant be deleted or something in db
 fun TaskUiState.toTask(): Task {

@@ -1,11 +1,12 @@
-package nish.wry.salamander.ui.chip
+package nish.wry.salamander.ui.chip.create
 
+import android.os.Parcelable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.parcelize.Parcelize
+import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
@@ -13,10 +14,23 @@ import nish.wry.salamander.data.room.Chip
 import nish.wry.salamander.di.TaskRepository
 import java.util.Calendar
 
-class CreateChipViewModel(private val repository: TaskRepository) : ViewModel() {
-    private val _chipUiState = MutableStateFlow(ChipUiState())
+class CreateChipViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val repository: TaskRepository,
+) : ViewModel() {
+    
+    private val _chipUiState = MutableSaveStateFlow(
+        savedStateHandle = savedStateHandle,
+        key = CHIP_UI_STATE_KEY,
+        defaultValue = ChipUiState()
+    )
 
-    private val _uiState = MutableStateFlow(UiState())
+
+    private val _uiState = MutableSaveStateFlow(
+        savedStateHandle = savedStateHandle,
+        key = UI_STATE_KEY,
+        defaultValue = UiState()
+    )
 
     val uiState = _uiState.asStateFlow()
 
@@ -105,9 +119,15 @@ class CreateChipViewModel(private val repository: TaskRepository) : ViewModel() 
         }
     }
 
+    private companion object {
+        private const val CHIP_UI_STATE_KEY = "CHIP_UI_STATE_KEY"
+        private const val UI_STATE_KEY = "UI_STATE"
+    }
+
 
 }
 
+@Parcelize
 data class ChipUiState(
     val name: String = "",
     val selectedTime: Calendar = Calendar.getInstance(),
@@ -116,13 +136,14 @@ data class ChipUiState(
     val timeless: Boolean = false,
     val offsetHours: Int = 1,
     val isInputValid: Boolean = false,
-)
+) : Parcelable
 
+@Parcelize
 data class UiState(
     val showTimePicker: Boolean = false,
     val fastTimeIoInput: String = "",
     val floatingOffsetString: String = "1",
-)
+) : Parcelable
 
 fun ChipUiState.toChip(): Chip {
     return Chip(

@@ -1,15 +1,23 @@
-package nish.wry.salamander.ui.chip
+package nish.wry.salamander.ui.task.create
 
 import android.text.format.DateFormat
-import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,15 +33,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
-import nish.wry.salamander.data.room.Chip
-import nish.wry.salamander.data.room.Task
-import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
 import nish.wry.salamander.ui.common.PrioritySegmentButton
@@ -43,24 +47,25 @@ import nish.wry.salamander.ui.common.TimeStampText
 import nish.wry.salamander.ui.common.TimelessSwitch
 import java.util.Calendar
 
+@Serializable
+object NewTaskDestination
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateChip(
-    exitChip: () -> Unit,
-    viewModel: CreateChipViewModel = viewModel(factory = AppViewModelProvider.Factory),
+fun NewTask(
+    onCreateChip: () -> Unit,
+    exitCreateTask: () -> Unit,
+    viewModel: NewTaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 ) {
-    BackHandler {
-        exitChip()
-    }
-
-    val chipUiState by viewModel.chipUiState.collectAsState()
+    val chips by viewModel.chips.collectAsState()
+    val taskUiState by viewModel.taskUiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     val timePickerState = rememberTimePickerState(
-        initialHour = chipUiState.selectedTime.get(Calendar.HOUR_OF_DAY),
-        initialMinute = chipUiState.selectedTime.get(Calendar.MINUTE),
+        initialHour = taskUiState.selectedTime.get(Calendar.HOUR_OF_DAY),
+        initialMinute = taskUiState.selectedTime.get(Calendar.MINUTE),
         is24Hour = DateFormat.is24HourFormat(LocalContext.current)
     )
 
@@ -68,23 +73,47 @@ fun CreateChip(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding),
         ) {
+
             TextField(
-                value = chipUiState.name,
-                onValueChange = viewModel::onChipNameChange,
-                label = { Text(stringResource(R.string.chip_name)) },
+                value = taskUiState.taskName,
+                onValueChange = viewModel::onTaskNameChange,
+                label = { Text(stringResource(R.string.title)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
-                isError = chipUiState.name.isBlank(),
+                    .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 8.dp),
+                isError = !taskUiState.isTaskNameValid,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Next
                 ),
             )
 
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(start = 24.dp, bottom = 16.dp)
+            ) {
+                chips.forEach {
+                    InputChip(
+                        selected = it.id == taskUiState.chipId,
+                        onClick = { viewModel.onChipSelected(it.id) },
+                        label = { Text(it.name) },
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+                IconButton(onClick = onCreateChip) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_event_chip)
+                    )
+                }
+            }
+
+
             PrioritySegmentButton(
-                selectedPriority = chipUiState.priority,
+                selectedPriority = taskUiState.priority,
                 changePriority = viewModel::onSegmentedButtonPriorityClick,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,39 +121,38 @@ fun CreateChip(
             )
 
             TimelessSwitch(
-                checked = chipUiState.timeless,
+                checked = taskUiState.timeless,
                 onSwitchToggle = viewModel::onTimelessSwitchClick,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-
-            if (chipUiState.timeless) {
+            if (taskUiState.timeless) {
                 TextField(
-                    value = uiState.floatingOffsetString,
+                    value = uiState.offsetHoursString,
                     onValueChange = viewModel::onOffsetTimeChange,
                     singleLine = true,
                     label = { Text(stringResource(R.string.offset_hours)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
-                        imeAction = if (chipUiState.isInputValid) ImeAction.Done else ImeAction.Previous
+                        imeAction = if (taskUiState.isTaskNameValid) ImeAction.Done else ImeAction.Previous
                     ),
                     modifier = Modifier.padding(start = 32.dp, end = 32.dp)
                 )
             }
 
-            if (!chipUiState.timeless) {
+            if (!taskUiState.timeless) {
                 TextField(
                     value = uiState.fastTimeIoInput,
                     onValueChange = viewModel::onFastIoInputChange,
                     label = { Text(stringResource(R.string.fast_time_io)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = if (chipUiState.isInputValid) ImeAction.Done else ImeAction.Previous
+                        imeAction = if (taskUiState.isTaskNameValid) ImeAction.Done else ImeAction.Previous
                     ),
                     modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 8.dp),
                 )
 
                 TimeStampText(
-                    time = chipUiState.selectedTime.time,
+                    time = taskUiState.selectedTime.time,
                     modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
                 )
 
@@ -142,11 +170,9 @@ fun CreateChip(
                 )
 
                 DaysOfTheWeekIconButtons(
-                    selectedWeekDaysBitmask = chipUiState.selectedWeekDaysBitmask,
+                    selectedWeekDaysBitmask = taskUiState.selectedWeekDaysBitmask,
                     setOrResetBitFlagForWeekday = viewModel::setOrResetBitFlagForWeekday,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp)
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -160,82 +186,27 @@ fun CreateChip(
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.saveCreatedChip()
-                            exitChip()
+                            viewModel.onSaveTaskClicked()
+                            exitCreateTask()
                         }
                     },
-                    enabled = chipUiState.isInputValid,
+                    enabled = taskUiState.isTaskNameValid && taskUiState.chipId != null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
                 ) {
                     Text(stringResource(R.string.save))
                 }
-                OutlinedButton(onClick = exitChip, modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = exitCreateTask,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(stringResource(R.string.cancel))
                 }
             }
-        }
-    }
-}
 
-@Preview
-@Composable
-fun CreateChipPreview() {
-    class FakeTaskRepository : TaskRepository {
-        override fun getAllChips(): Flow<List<Chip>> {
-            TODO("Not yet implemented")
-        }
-
-        override fun getChipWithId(id: Int): Flow<Chip> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun createChip(chip: Chip) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun deleteChip(chip: Chip) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun updateChip(chip: Chip) {
-            TODO("Not yet implemented")
-        }
-
-        override fun getTasksWithChip(chipId: Int): Flow<List<Task>> {
-            TODO("Not yet implemented")
-        }
-
-        override fun getTaskWithId(id: Int): Flow<Task> {
-            TODO("Not yet implemented")
-        }
-
-        override fun getTaskForNextThreeDays(
-            bitmask: Int,
-            startDate: Calendar,
-            endDate: Calendar,
-        ): Flow<List<Task>> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun createTask(task: Task) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun updateTask(task: Task) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun deleteTask(task: Task) {
-            TODO("Not yet implemented")
         }
 
     }
-
-    CreateChip(
-        viewModel = CreateChipViewModel(repository = FakeTaskRepository()),
-        exitChip = {}
-    )
 }
 
