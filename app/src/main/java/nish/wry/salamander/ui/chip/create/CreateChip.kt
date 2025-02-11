@@ -1,7 +1,6 @@
 package nish.wry.salamander.ui.chip.create
 
 import android.text.format.DateFormat
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
@@ -40,6 +40,9 @@ import nish.wry.salamander.ui.common.TimeStampText
 import nish.wry.salamander.ui.common.TimelessSwitch
 import java.util.Calendar
 
+@Serializable
+object CreateChipDestination
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateChip(
@@ -47,9 +50,8 @@ fun CreateChip(
     viewModel: CreateChipViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 ) {
-    BackHandler {
-        exitChip()
-    }
+//    don't need it anymore cuz of multiple backstack
+//    BackHandler(onBack = exitChip)
 
     val chipUiState by viewModel.chipUiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()

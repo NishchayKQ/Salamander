@@ -3,7 +3,7 @@ package nish.wry.salamander.ui.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
-interface NavigationDestination {
+interface MainDestination {
     @get:StringRes
     val titleRes: Int
 

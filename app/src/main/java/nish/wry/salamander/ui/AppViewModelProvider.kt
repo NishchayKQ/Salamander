@@ -10,13 +10,10 @@ import nish.wry.salamander.di.SalamanderApplication
 import nish.wry.salamander.ui.chip.create.CreateChipViewModel
 import nish.wry.salamander.ui.chip.edit.EditChipViewModel
 import nish.wry.salamander.ui.task.TaskViewModel
-import nish.wry.salamander.ui.task.create.NewTaskViewModel
+import nish.wry.salamander.ui.task.create.CreateTaskViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
-        initializer {
-            SalamanderViewModel(this.createSavedStateHandle())
-        }
         initializer {
             TaskViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
@@ -25,7 +22,7 @@ object AppViewModelProvider {
             )
         }
         initializer {
-            NewTaskViewModel(
+            CreateTaskViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
                 repository = salamanderApplication().container.taskRepository,
                 getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository)

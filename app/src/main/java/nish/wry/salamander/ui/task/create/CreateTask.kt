@@ -48,16 +48,18 @@ import nish.wry.salamander.ui.common.TimelessSwitch
 import java.util.Calendar
 
 @Serializable
-object NewTaskDestination
+object CreateTaskDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewTask(
+fun CreateTask(
     onCreateChip: () -> Unit,
     exitCreateTask: () -> Unit,
-    viewModel: NewTaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: CreateTaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 ) {
+//    BackHandler(onBack = exitCreateTask)
+
     val chips by viewModel.chips.collectAsState()
     val taskUiState by viewModel.taskUiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()

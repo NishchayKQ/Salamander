@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task
+package nish.wry.salamander.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,11 +8,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.serialization.Serializable
+import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
+import nish.wry.salamander.ui.navigation.MainDestination
+import nish.wry.salamander.ui.task.TaskBottomAppBar
+import nish.wry.salamander.ui.task.TaskCanvas
+import nish.wry.salamander.ui.task.TaskTopAppBar
+import nish.wry.salamander.ui.task.TaskViewModel
+
+@Serializable
+object MainTaskDestination : MainDestination {
+    override val titleRes: Int = R.string.task
+    override val iconRes = R.drawable.outline_checklist_24
+}
+
+@Serializable
+object TaskTimelineDestination
 
 @Composable
 fun TaskTimelineScreen(
-    onAddTaskClicked: () -> Unit,
+    onCreateTaskClicked: () -> Unit,
     onEditChipClicked: (Int) -> Unit,
     viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
@@ -35,7 +51,7 @@ fun TaskTimelineScreen(
             onQueryChange = viewModel::updateSearchQuery
         )
     }, bottomBar = {
-        TaskBottomAppBar(onAddTaskClick = onAddTaskClicked)
+        TaskBottomAppBar(onAddTaskClick = onCreateTaskClicked)
     }, modifier = modifier.fillMaxSize()
     ) { innerPadding ->
 

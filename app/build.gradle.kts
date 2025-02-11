@@ -95,9 +95,4 @@ dependencies {
 
     // for window size class
     implementation(libs.androidx.material3.window.size)
-
-    // for list detail scaffold and supporting libs
-    implementation(libs.androidx.adaptive)
-    implementation(libs.androidx.adaptive.layout)
-    implementation(libs.androidx.adaptive.navigation)
 }

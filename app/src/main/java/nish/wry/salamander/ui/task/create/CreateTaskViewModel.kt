@@ -18,7 +18,7 @@ import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
 import java.util.Calendar
 
-class NewTaskViewModel(
+class CreateTaskViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
     getAllChipsUseCase: GetAllChipsUseCase,
