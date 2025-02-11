@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.SalamanderApplication
 import nish.wry.salamander.ui.chip.create.CreateChipViewModel
-import nish.wry.salamander.ui.chip.edit.EditChipViewModel
 import nish.wry.salamander.ui.task.TaskViewModel
 import nish.wry.salamander.ui.task.create.CreateTaskViewModel
 
@@ -34,7 +33,6 @@ object AppViewModelProvider {
                 repository = salamanderApplication().container.taskRepository
             )
         }
-        initializer { EditChipViewModel(savedStateHandle = this.createSavedStateHandle()) }
     }
 }
 

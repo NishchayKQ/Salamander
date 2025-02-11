@@ -27,7 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import nish.wry.salamander.data.Constants
 import nish.wry.salamander.ui.chip.create.CreateChip
 import nish.wry.salamander.ui.chip.create.CreateChipDestination
-import nish.wry.salamander.ui.chip.edit.EditChipDestination
+import nish.wry.salamander.ui.navigation.EditChipDestination
 import nish.wry.salamander.ui.screens.MainNishchayDestination
 import nish.wry.salamander.ui.screens.MainSuBaseDestination
 import nish.wry.salamander.ui.screens.MainTaskDestination
@@ -171,7 +171,17 @@ private fun AppNavHost(
                     }
 
                 }
-                composable<EditChipDestination> { }
+                composable<EditChipDestination> {
+                    Row {
+                        if (isOnlyExpandedWindowSize) {
+                            taskTimeLineScreen(Modifier.weight(0.6f))
+                        }
+                        CreateChip(
+                            exitChip = { taskNavController.popBackStack() },
+                            modifier = Modifier.weight(0.4f)
+                        )
+                    }
+                }
 
             }
         }

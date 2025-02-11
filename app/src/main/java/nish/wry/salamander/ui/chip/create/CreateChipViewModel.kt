@@ -5,20 +5,45 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
 import nish.wry.salamander.data.room.Chip
+import nish.wry.salamander.data.room.toChipUiState
 import nish.wry.salamander.di.TaskRepository
+import nish.wry.salamander.ui.navigation.EditChipDestination
 import java.util.Calendar
 
 class CreateChipViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
 ) : ViewModel() {
-    
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private val chipId: Int? = try {
+        savedStateHandle.toRoute<EditChipDestination>().chipId
+    } catch (e: MissingFieldException) {
+        null
+    }
+
+    init {
+        if (chipId != null) {
+            viewModelScope.launch {
+                val fetchedChipUiState = repository.getChipWithId(chipId).first().toChipUiState()
+                _chipUiState.update { fetchedChipUiState }
+                _uiState.update { UiState(floatingOffsetString = fetchedChipUiState.offsetHours.toString()) }
+            }
+        }
+    }
+
     private val _chipUiState = MutableSaveStateFlow(
         savedStateHandle = savedStateHandle,
         key = CHIP_UI_STATE_KEY,
@@ -113,7 +138,11 @@ class CreateChipViewModel(
 
     suspend fun saveCreatedChip(uiState: ChipUiState = chipUiState.value) {
         if (uiState.name.isNotBlank()) {
-            repository.createChip(chipUiState.value.toChip())
+            if (chipId != null) {
+                repository.updateChip(chipUiState.value.toChip())
+            } else {
+                repository.createChip(chipUiState.value.toChip())
+            }
             _chipUiState.update { ChipUiState() }
             _uiState.update { UiState() }
         }
@@ -121,7 +150,7 @@ class CreateChipViewModel(
 
     private companion object {
         private const val CHIP_UI_STATE_KEY = "CHIP_UI_STATE_KEY"
-        private const val UI_STATE_KEY = "UI_STATE"
+        private const val UI_STATE_KEY = "UI_STATE_KEY"
     }
 
 
@@ -129,6 +158,7 @@ class CreateChipViewModel(
 
 @Parcelize
 data class ChipUiState(
+    val chipId: Int = 0,
     val name: String = "",
     val selectedTime: Calendar = Calendar.getInstance(),
     val selectedWeekDaysBitmask: Int = 0,
@@ -147,6 +177,7 @@ data class UiState(
 
 fun ChipUiState.toChip(): Chip {
     return Chip(
+        id = chipId,
         name = name,
         repeatOnDaysBitFlag = if (!timeless) selectedWeekDaysBitmask else 0,
         dateTime = if (!timeless) selectedTime else null,

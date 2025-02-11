@@ -65,8 +65,8 @@ class TaskViewModel(
     }
 
     private companion object {
-        private const val TIMELINE_UI_STATE_KEY = "TIME_LINE_UI_STATE"
-        private const val TASK_SCREEN_UI_STATE_KEY = "TASK_SCREEN_UI_STATE"
+        private const val TIMELINE_UI_STATE_KEY = "TIMELINE_UI_STATE_KEY"
+        private const val TASK_SCREEN_UI_STATE_KEY = "TASK_SCREEN_UI_STATE_KEY"
     }
 
 }

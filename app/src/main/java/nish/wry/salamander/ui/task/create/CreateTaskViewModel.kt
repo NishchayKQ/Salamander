@@ -133,8 +133,8 @@ class CreateTaskViewModel(
     }
 
     private companion object {
-        private const val UI_STATE_KEY = "UI_STATE"
-        private const val TASK_UI_STATE_KEY = "TASK_UI_STATE"
+        private const val UI_STATE_KEY = "UI_STATE_KEY"
+        private const val TASK_UI_STATE_KEY = "TASK_UI_STATE_KEY"
     }
 
 
