@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import nish.wry.salamander.data.Priority
 import java.util.Calendar
 
 //TODO do we need custom onDelete and onUpdate policy?
@@ -21,6 +22,9 @@ data class Task(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
+    @ColumnInfo(name = "task_chip", index = true)
+    val taskChipId: Int,
+
     val name: String,
 
     @ColumnInfo(name = "weekdays_bitflag")
@@ -32,6 +36,5 @@ data class Task(
     @ColumnInfo(name = "floating_offset_hours")
     val floatingOffsetHours: Int? = null,
 
-    @ColumnInfo(name = "task_chip", index = true)
-    val taskChip: Int,
+    val priority: Priority = Priority.Normal
 )

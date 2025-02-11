@@ -20,7 +20,7 @@ import java.util.TimeZone
 
 @Composable
 fun TimeTrackerScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // for fun
     var currentTime by rememberSaveable { mutableStateOf(getCurrentTime()) }

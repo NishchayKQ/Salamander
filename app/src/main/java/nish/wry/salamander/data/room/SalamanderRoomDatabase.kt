@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @TypeConverters(Converters::class)
-@Database(entities = [Chip::class, Task::class], version = 1)
+@Database(entities = [Chip::class, Task::class], version = 4)
 abstract class SalamanderRoomDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 

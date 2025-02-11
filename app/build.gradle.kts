@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
     alias(libs.plugins.compose.compiler)
+
+    // Kotlin serialization plugin for type safe routes and navigation arguments
+    kotlin("plugin.serialization") version "2.0.21"
+
+    // support for Parcelable
+    id("kotlin-parcelize")
 }
 
 android {
@@ -20,7 +26,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        ksp{
+        ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
 
@@ -63,16 +69,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-//    //navigation
-//    implementation(libs.androidx.navigation.runtime.ktx)
-//    implementation(libs.androidx.navigation.compose)
-
-    //adaptive navigation rail
-    implementation(libs.androidx.material3.adaptive.navigation.suite)
-
-    // viewmodel
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
     //testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -83,19 +79,25 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // NavHost and NavHostController's
+    implementation(libs.androidx.navigation.compose)
+
+    // viewmodel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     //Room
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    //paging
-    implementation(libs.androidx.paging.runtime)
-    // Jetpack Compose integration
-    implementation(libs.androidx.paging.compose)
+    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation(libs.kotlinx.serialization.json)
 
-    // alternatively - without Android dependencies for tests
-//    testImplementation("androidx.paging:paging-common:3.3.5")
+    // for window size class
+    implementation(libs.androidx.material3.window.size)
 
-
-
+    // for list detail scaffold and supporting libs
+    implementation(libs.androidx.adaptive)
+    implementation(libs.androidx.adaptive.layout)
+    implementation(libs.androidx.adaptive.navigation)
 }

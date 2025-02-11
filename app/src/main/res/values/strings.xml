@@ -8,4 +8,13 @@
     <string name="task">Task</string>
     <string name="nishchay">Nishchay</string>
     <string name="search_for_a_task">search for a task</string>
+    <string name="title">Title</string>
+    <string name="fast_time_io">Fast time io</string>
+    <string name="set_time">Set time</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="add_event_chip">add event chip</string>
+    <string name="chip_name">Chip name</string>
+    <string name="offset_hours">Offset hours</string>
+    <string name="save">Save</string>
 </resources>

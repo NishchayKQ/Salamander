@@ -7,9 +7,10 @@ import androidx.lifecycle.ViewModel
 import nish.wry.salamander.ui.navigation.NavigationDestination
 import nish.wry.salamander.ui.screens.NishchayDestination
 import nish.wry.salamander.ui.screens.SuBaseDestination
-import nish.wry.salamander.ui.task.TaskDestination
+import nish.wry.salamander.ui.screens.TaskDestination
 
 class SalamanderViewModel : ViewModel() {
+
     val listOfDestination: List<NavigationDestination> = listOf(
         SuBaseDestination,
         TaskDestination,

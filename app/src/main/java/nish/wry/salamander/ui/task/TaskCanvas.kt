@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -16,8 +17,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import nish.wry.salamander.data.Constants
@@ -25,12 +28,13 @@ import java.util.Calendar
 
 // TODO implement listener for fling scroll motion
 @Composable
-fun Timeline(
+fun TaskCanvas(
     uiState: TimelineUiState,
     updateScaleAndOffset: (scale: Float, offsetY: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val textMeasurer = rememberTextMeasurer()
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
     val hourHeight = Constants.HOUR_HEIGHT.dp
 
     var scale by rememberSaveable { mutableFloatStateOf(uiState.scale) }
@@ -91,7 +95,6 @@ fun Timeline(
         for (hour in startHour..endHour) {
 
             val yPos = hour * scaledHourHeight - offsetY
-
             drawText(
                 textMeasurer = textMeasurer,
                 text = if (is24Hour) {
@@ -112,4 +115,13 @@ fun Timeline(
 
     }
 
+}
+
+@Preview
+@Composable
+private fun TaskCanvasPreview() {
+    TaskCanvas(
+        uiState = TimelineUiState(),
+        updateScaleAndOffset = { _, _ -> },
+    )
 }

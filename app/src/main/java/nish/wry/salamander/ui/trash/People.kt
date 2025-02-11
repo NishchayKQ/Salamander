@@ -21,28 +21,28 @@ fun PeopleInteractionScreen(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
 
-        
+
         Canvas(modifier = Modifier) {
 
         }
 
         Text("will have chips to click to search interaction with specific people. like dhoobi chip i user can add and that will let me put all interaction with them in it")
-        Button(onClick = {testShow = !testShow}) {
+        Button(onClick = { testShow = !testShow }) {
             Text("boop")
         }
-        if (testShow){
+        if (testShow) {
             DaBaby()
         }
     }
 }
 
 @Composable
-fun DaBaby(modifier: Modifier=Modifier){
+fun DaBaby(modifier: Modifier = Modifier) {
     // notice how even if its remember Saveable, it gets forgotten, cuz once its out of composition remember stuff is forgotten
     var currValue by rememberSaveable { mutableStateOf("") }
     OutlinedTextField(
         value = currValue,
-        onValueChange = {currValue = it},
+        onValueChange = { currValue = it },
         modifier = modifier,
     )
 }

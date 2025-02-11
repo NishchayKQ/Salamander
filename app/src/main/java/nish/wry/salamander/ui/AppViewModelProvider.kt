@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.SalamanderApplication
+import nish.wry.salamander.ui.chip.CreateChipViewModel
+import nish.wry.salamander.ui.newTask.NewTaskViewModel
 import nish.wry.salamander.ui.task.TaskViewModel
 
 object AppViewModelProvider {
@@ -14,7 +17,19 @@ object AppViewModelProvider {
         }
         initializer {
             TaskViewModel(
-//                salamanderApplication().container.taskRepository
+                salamanderApplication().container.taskRepository,
+                getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository)
+            )
+        }
+        initializer {
+            NewTaskViewModel(
+                repository = salamanderApplication().container.taskRepository,
+                getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository)
+            )
+        }
+        initializer {
+            CreateChipViewModel(
+                salamanderApplication().container.taskRepository
             )
         }
     }

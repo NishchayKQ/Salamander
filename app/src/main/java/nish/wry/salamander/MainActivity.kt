@@ -6,18 +6,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
 import nish.wry.salamander.ui.SalamanderApp
 import nish.wry.salamander.ui.theme.SalamanderTheme
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val windowWidthSizeClass = calculateWindowSizeClass(this).widthSizeClass
             SalamanderTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SalamanderApp()
+                    SalamanderApp(windowSizeClass = windowWidthSizeClass)
                 }
             }
         }

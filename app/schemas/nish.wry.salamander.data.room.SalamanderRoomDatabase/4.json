@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "b93728437cb23fe09d1b1898ad1093d9",
+    "version": 4,
+    "identityHash": "808704b68fca0cd9a516d4e744c5b184",
     "entities": [
       {
         "tableName": "chip",
@@ -56,11 +56,17 @@
       },
       {
         "tableName": "task",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `weekdays_bitflag` INTEGER NOT NULL, `date_time` INTEGER, `floating_offset_hours` INTEGER, `task_chip` INTEGER NOT NULL, FOREIGN KEY(`task_chip`) REFERENCES `chip`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `task_chip` INTEGER NOT NULL, `name` TEXT NOT NULL, `weekdays_bitflag` INTEGER NOT NULL, `date_time` INTEGER, `floating_offset_hours` INTEGER, `priority` INTEGER NOT NULL, FOREIGN KEY(`task_chip`) REFERENCES `chip`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskChipId",
+            "columnName": "task_chip",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -89,8 +95,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "taskChip",
-            "columnName": "task_chip",
+            "fieldPath": "priority",
+            "columnName": "priority",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -130,7 +136,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b93728437cb23fe09d1b1898ad1093d9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '808704b68fca0cd9a516d4e744c5b184')"
     ]
   }
 }

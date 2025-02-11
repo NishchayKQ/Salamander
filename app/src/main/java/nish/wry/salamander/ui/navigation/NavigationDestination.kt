@@ -4,11 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
 interface NavigationDestination {
-    val route: Routes
-
     @get:StringRes
     val titleRes: Int
 
     @get:DrawableRes
-    val icon: Int
+    val iconRes: Int
 }

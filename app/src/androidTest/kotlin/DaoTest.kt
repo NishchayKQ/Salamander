@@ -74,7 +74,7 @@ class DaoTest {
             id = 1,
             name = "go to college 💀 at 4am",
             dateTime = calendar,
-            taskChip = 1
+            taskChipId = 1
         )
 
         calendar.clear()
@@ -85,8 +85,8 @@ class DaoTest {
             id = 2,
             name = "buy bread 🍞",
             dateTime = calendar,
-            repeatOnDaysBitFlag = Week.SUNDAY + (Week.MONDAY + Week.SATURDAY),
-            taskChip = 2
+            repeatOnDaysBitFlag = Week.SUNDAY or (Week.MONDAY or Week.SATURDAY),
+            taskChipId = 2
         )
 
 

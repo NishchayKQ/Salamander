@@ -5,35 +5,37 @@ import java.util.Calendar
 
 enum class Week(
     @get:VisibleForTesting
-    val mask: Int
+    val mask: Int,
+    val letter: String,
 ) {
-    MONDAY(1),
-    TUESDAY(2),
-    WEDNESDAY(4),
-    THURSDAY(8),
-    FRIDAY(16),
-    SATURDAY(32),
-    SUNDAY(64);
+    MONDAY(1, "M"),
+    TUESDAY(2, "T"),
+    WEDNESDAY(4, "W"),
+    THURSDAY(8, "T"),
+    FRIDAY(16, "F"),
+    SATURDAY(32, "S"),
+    SUNDAY(64, "S");
 
-    @VisibleForTesting
-    operator fun plus(other: Week): Int {
+    infix fun or(other: Week): Int {
         // TODO write in notes, we use 'bitwise or' but simple '+' is also ok, though '+' fails if same flag is passed twice
         return this.mask or other.mask
     }
 
-    @VisibleForTesting
-    operator fun plus(other: Int): Int {
+    infix fun or(other: Int): Int {
         return this.mask or other
+    }
+
+    fun inv(): Int {
+        return this.mask.inv()
     }
 
     fun bitMaskForNextThreeDaysFromToday(calender: Calendar): Int {
         val currentDayOfWeek = calender.get(Calendar.DAY_OF_WEEK)
         val nextDay = giveNextValidWeekdayNumber(currentDayOfWeek)
         val nextNextDay = giveNextValidWeekdayNumber(nextDay)
-        return calenderDayToWeekEnum(currentDayOfWeek) + (calenderDayToWeekEnum(nextDay) + calenderDayToWeekEnum(
-            nextNextDay
-        ))
-
+        return calenderDayToWeekEnum(currentDayOfWeek) or calenderDayToWeekEnum(nextDay) or (
+                calenderDayToWeekEnum(nextNextDay)
+                )
     }
 
     private fun giveNextValidWeekdayNumber(dayOfWeek: Int): Int {
@@ -58,4 +60,12 @@ enum class Week(
             }
         }
     }
+}
+
+infix fun Int.or(other: Week): Int {
+    return this or other.mask
+}
+
+infix fun Int.and(other: Week): Int {
+    return this and other.mask
 }
