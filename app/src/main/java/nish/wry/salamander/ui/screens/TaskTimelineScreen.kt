@@ -12,6 +12,9 @@ import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
+import nish.wry.salamander.ui.task.CurrentTimeDivider
+import nish.wry.salamander.ui.task.CurrentTimeText
+import nish.wry.salamander.ui.task.HourLabels
 import nish.wry.salamander.ui.task.TaskBottomAppBar
 import nish.wry.salamander.ui.task.TaskTopAppBar
 import nish.wry.salamander.ui.task.TaskViewModel
@@ -55,15 +58,11 @@ fun TaskTimelineScreen(
     }, modifier = modifier.fillMaxSize()
     ) { innerPadding ->
 
-
-
-
         TimelineLayout(
-            modifier = Modifier.padding(innerPadding)
+            hourLabels = { HourLabels() },
+            currentTimeComposable = { CurrentTimeText() },
+            currentTimeDivider = { CurrentTimeDivider() },
+            modifier = Modifier.padding(innerPadding),
         )
-
     }
-
-
 }
-
