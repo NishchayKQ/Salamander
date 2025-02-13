@@ -13,9 +13,9 @@ import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
 import nish.wry.salamander.ui.task.TaskBottomAppBar
-import nish.wry.salamander.ui.task.TaskCanvas
 import nish.wry.salamander.ui.task.TaskTopAppBar
 import nish.wry.salamander.ui.task.TaskViewModel
+import nish.wry.salamander.ui.task.TimelineLayout
 
 @Serializable
 object MainTaskDestination : MainDestination {
@@ -55,9 +55,10 @@ fun TaskTimelineScreen(
     }, modifier = modifier.fillMaxSize()
     ) { innerPadding ->
 
-        TaskCanvas(
-            uiState = timelineUiState,
-            updateScaleAndOffset = viewModel::updateZoomAndScroll,
+
+
+
+        TimelineLayout(
             modifier = Modifier.padding(innerPadding)
         )
 
@@ -65,3 +66,4 @@ fun TaskTimelineScreen(
 
 
 }
+

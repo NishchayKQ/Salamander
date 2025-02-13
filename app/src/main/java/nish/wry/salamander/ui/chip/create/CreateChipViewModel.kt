@@ -193,6 +193,6 @@ fun Chip.toChipUiState(): ChipOrTaskUiState =
         selectedWeekDaysBitmask = repeatOnDaysBitFlag,
         priority = priority,
         timeless = dateTime == null,
-        offsetHours = floatingOffsetHours ?: 0,
+        offsetHours = floatingOffsetHours ?: 1,
         isEntryValid = false
     )

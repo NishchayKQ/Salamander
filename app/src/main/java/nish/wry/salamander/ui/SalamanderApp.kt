@@ -28,6 +28,7 @@ import nish.wry.salamander.data.Constants
 import nish.wry.salamander.ui.chip.create.CreateChip
 import nish.wry.salamander.ui.chip.create.CreateChipDestination
 import nish.wry.salamander.ui.navigation.EditChipDestination
+import nish.wry.salamander.ui.navigation.EditTaskDestination
 import nish.wry.salamander.ui.screens.MainNishchayDestination
 import nish.wry.salamander.ui.screens.MainSuBaseDestination
 import nish.wry.salamander.ui.screens.MainTaskDestination
@@ -142,7 +143,7 @@ private fun AppNavHost(
                 composable<CreateTaskDestination> {
                     Row {
                         if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.6f))
+                            taskTimeLineScreen(Modifier.weight(0.5f))
                         }
                         CreateTask(
                             onCreateChip = { taskNavController.navigate(CreateChipDestination) },
@@ -151,7 +152,7 @@ private fun AppNavHost(
                                     TaskTimelineDestination, false
                                 )
                             },
-                            modifier = Modifier.weight(0.4f)
+                            modifier = Modifier.weight(0.5f)
                         )
                     }
                 }
@@ -159,14 +160,14 @@ private fun AppNavHost(
                 composable<CreateChipDestination> {
                     Row {
                         if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.6f))
+                            taskTimeLineScreen(Modifier.weight(0.5f))
                         }
                         CreateChip(
                             exitChip = {
                                 taskNavController.popBackStack(
                                     CreateTaskDestination, false
                                 )
-                            }, modifier = Modifier.weight(0.4f)
+                            }, modifier = Modifier.weight(0.5f)
                         )
                     }
 
@@ -174,11 +175,24 @@ private fun AppNavHost(
                 composable<EditChipDestination> {
                     Row {
                         if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.6f))
+                            taskTimeLineScreen(Modifier.weight(0.5f))
                         }
                         CreateChip(
                             exitChip = { taskNavController.popBackStack() },
-                            modifier = Modifier.weight(0.4f)
+                            modifier = Modifier.weight(0.5f)
+                        )
+                    }
+                }
+
+                composable<EditTaskDestination> {
+                    Row {
+                        if (isOnlyExpandedWindowSize) {
+                            taskTimeLineScreen(Modifier.weight(0.5f))
+                        }
+                        CreateTask(
+                            onCreateChip = { taskNavController.navigate(CreateChipDestination) },
+                            exitCreateTask = { taskNavController.popBackStack() },
+                            modifier = Modifier.weight(0.5f)
                         )
                     }
                 }

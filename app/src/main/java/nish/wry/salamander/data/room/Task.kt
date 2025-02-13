@@ -36,5 +36,5 @@ data class Task(
     @ColumnInfo(name = "floating_offset_hours")
     val floatingOffsetHours: Int? = null,
 
-    val priority: Priority = Priority.Normal
+    val priority: Priority = Priority.Normal,
 )

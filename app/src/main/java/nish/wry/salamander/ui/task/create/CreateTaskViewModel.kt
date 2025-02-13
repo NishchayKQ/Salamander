@@ -5,7 +5,12 @@ import androidx.compose.material3.TimePickerState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
@@ -16,6 +21,7 @@ import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.chip.create.ChipOrTaskUiState
 import nish.wry.salamander.ui.chip.create.UiState
+import nish.wry.salamander.ui.navigation.EditTaskDestination
 import java.util.Calendar
 
 class CreateTaskViewModel(
@@ -24,6 +30,22 @@ class CreateTaskViewModel(
     getAllChipsUseCase: GetAllChipsUseCase,
 ) : ViewModel() {
 
+    @OptIn(ExperimentalSerializationApi::class)
+    private val taskId: Int? = try {
+        savedStateHandle.toRoute<EditTaskDestination>().taskId
+    } catch (e: MissingFieldException) {
+        null
+    }
+
+    init {
+        if (taskId != null) {
+            viewModelScope.launch {
+                val fetchedTaskUiState = repository.getTaskWithId(taskId).first().toTaskUiState()
+                _taskUiStateUiState.update { fetchedTaskUiState }
+                _uiState.update { UiState(offsetHoursString = fetchedTaskUiState.offsetHours.toString()) }
+            }
+        }
+    }
 
     val chips: StateFlow<List<Chip>> = getAllChipsUseCase(viewModelScope)
 
@@ -151,3 +173,15 @@ fun ChipOrTaskUiState.toTask(): Task {
         priority = priority
     )
 }
+
+fun Task.toTaskUiState(): ChipOrTaskUiState =
+    ChipOrTaskUiState(
+        chipId = taskChipId,
+        name = name,
+        selectedTime = dateTime ?: Calendar.getInstance(),
+        selectedWeekDaysBitmask = repeatOnDaysBitFlag,
+        priority = priority,
+        timeless = dateTime == null,
+        offsetHours = floatingOffsetHours ?: 1,
+        isEntryValid = false
+    )
