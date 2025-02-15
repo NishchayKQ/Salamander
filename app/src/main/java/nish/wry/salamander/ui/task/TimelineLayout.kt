@@ -34,6 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import nish.wry.salamander.data.Constants
+import nish.wry.salamander.ui.task.TimelineScope.taskData
 import java.util.Calendar
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -55,7 +56,8 @@ fun TimelineLayout(
     var cal = Calendar.getInstance()
     var currentTimePos by remember { mutableFloatStateOf(cal[Calendar.HOUR_OF_DAY] + cal[Calendar.MINUTE] / 60f) }
 
-    // FIXME the update does happens after a min, but it might be 59 secs after the minute has changed. Example: update at 9:00:59 so next second current time is 9:01 but app takes a whole minute delay to realise this
+    // FIXME the update does happens after a min, but it might be 59 secs after the minute has changed.
+    //  Example: update at 9:00:59 so next second current time is 9:01 but app takes a whole minute delay to realise this
     LaunchedEffect(Unit) {
         while (isActive) {
             cal = Calendar.getInstance()
@@ -124,7 +126,8 @@ fun TimelineLayout(
 
             val totalWidth = dividersPlaceable.first().width
 
-            val xStartOffset = hoursPlaceable.first().width + 15.dp.toPx().roundToInt()
+            // the arrow's right most cord is 15.dp, text inside task box is 4.dp, so we add 11.dp
+            val xStartOffset = currentTimePlaceable.width + 11.dp.toPx().roundToInt()
             val widthAvailableForTasks = dividersPlaceable.first().width - xStartOffset
 
             val singleHourHeight: Int = dividersPlaceable.first().height
@@ -150,6 +153,17 @@ fun TimelineLayout(
 
 
             layout(totalWidth, totalHeight) {
+                tasksPlaceable.forEach { taskPlaceable ->
+                    val taskParentData = taskPlaceable.parentData as TaskParentData
+                    val taskOffset =
+                        ((widthAvailableForTasks / taskParentData.maxSimultaneous) * taskParentData.index)
+
+                    taskPlaceable.place(
+                        x = xStartOffset + taskOffset,
+                        y = ((taskParentData.startMins * singleHourHeight) / 60) + taskVerticalPadding
+                    )
+                }
+
                 val xPos = 0
                 var yPos = singleHourHeight
                 // fractional hour length (5:30am = 5.5hrs) * length of each hour
@@ -166,21 +180,11 @@ fun TimelineLayout(
                     yPos += dividerPlaceable.height
                 }
 
+                // place them at top ie last
                 currentTimePlaceable.place(
                     xPos, (currentHourY - currentTimePlaceable.height / 2)
                 )
                 currentTimeDividerPlaceable.place(currentTimePlaceable.width, currentHourY)
-
-                tasksPlaceable.forEach { taskPlaceable ->
-                    val taskParentData = taskPlaceable.parentData as TaskParentData
-                    val taskOffset =
-                        ((widthAvailableForTasks / taskParentData.maxSimultaneous) * taskParentData.index)
-
-                    taskPlaceable.place(
-                        x = xStartOffset + taskOffset,
-                        y = ((taskParentData.startMins * singleHourHeight) / 60) + taskVerticalPadding
-                    )
-                }
             }
         }
     }
@@ -200,12 +204,20 @@ private fun TimelineLayoutPreview() {
         dividerBars = { },
         tasksComposable = {
             TasksBox(
-                clusterList = listOf(
-                    Cluster(
-                        mutableListOf(TaskOnGraph(0, "meow", 960, 990)),
-                        maxTaskSimultaneously = 1
+                taskDrawingDataList = listOf(
+                    TaskDrawingData(
+                        0,
+                        "meow",
+                        1,
+                        Modifier.taskData(
+                            index = 0,
+                            maxSimultaneous = 1,
+                            startMins = 330,
+                            endMins = 360
+                        )
                     )
                 ),
+                chipIdsSelected = setOf(),
                 onDeleteTaskClicked = {},
                 onTaskClicked = {}
             )

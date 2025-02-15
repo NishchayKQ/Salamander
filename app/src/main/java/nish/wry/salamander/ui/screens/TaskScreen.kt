@@ -3,6 +3,10 @@ package nish.wry.salamander.ui.screens
 import android.content.IntentFilter
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -13,12 +17,11 @@ import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
-import nish.wry.salamander.ui.task.Cluster
 import nish.wry.salamander.ui.task.CurrentTimeDivider
 import nish.wry.salamander.ui.task.CurrentTimeText
 import nish.wry.salamander.ui.task.HourLabels
 import nish.wry.salamander.ui.task.HourlyDividers
-import nish.wry.salamander.ui.task.TaskBottomAppBar
+import nish.wry.salamander.ui.task.TaskDrawingData
 import nish.wry.salamander.ui.task.TaskTopAppBar
 import nish.wry.salamander.ui.task.TaskViewModel
 import nish.wry.salamander.ui.task.TasksBox
@@ -46,27 +49,37 @@ fun TaskScreen(
     val taskScreenUiState by viewModel.taskScreenUiState.collectAsState()
     val chips by viewModel.chips.collectAsState()
 
-    Scaffold(topBar = {
-        TaskTopAppBar(
-            chips = chips,
-            selectedChipIds = timelineUiState.selectedChipIDs,
-            onChipClicked = viewModel::onChipClicked,
-            onEditChipClicked = onEditChipClicked,
-            onDeleteChipClicked = {},
-            searchQuery = taskScreenUiState.query,
-            expanded = taskScreenUiState.expanded,
-            onExpandedChange = viewModel::setSearchExpandedState,
-            onSearch = { viewModel.setSearchExpandedState(false) },
-            onQueryChange = viewModel::updateSearchQuery
-        )
-    }, bottomBar = {
-        TaskBottomAppBar(onAddTaskClick = onCreateTaskClicked)
-    }, modifier = modifier.fillMaxSize()
+    Scaffold(
+        topBar = {
+            TaskTopAppBar(
+                chips = chips,
+                selectedChipIds = timelineUiState.selectedChipIDs,
+                onChipClicked = viewModel::onChipClicked,
+                onEditChipClicked = onEditChipClicked,
+                onDeleteChipClicked = {},
+                searchQuery = taskScreenUiState.query,
+                expanded = taskScreenUiState.expanded,
+                onExpandedChange = viewModel::setSearchExpandedState,
+                onSearch = { viewModel.setSearchExpandedState(false) },
+                onQueryChange = viewModel::updateSearchQuery
+            )
+        },
+//        bottomBar = {
+////        TaskBottomAppBar(onAddTaskClick = onCreateTaskClicked)
+//    },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onCreateTaskClicked,
+            ) {
+                Icon(Icons.Default.Add, null)
+            }
+        },
+        modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         IntentFilter("")
 
         val taskState by viewModel.currentDayDataFlow.collectAsState()
-        val tasks: List<Cluster> =
+        val tasks: List<TaskDrawingData> =
             taskState[Calendar.getInstance()[Calendar.DAY_OF_YEAR]] ?: listOf()
 
         TimelineLayout(
@@ -77,11 +90,14 @@ fun TaskScreen(
             scrollValue = timelineUiState.scrollValue,
             scale = timelineUiState.scale,
             dividerBars = { HourlyDividers() },
-            tasksComposable = { TasksBox(
-                clusterList = tasks,
-                onTaskClicked = onTaskClicked,
-                onDeleteTaskClicked = viewModel::onDeleteTaskClicked
-            ) },
+            tasksComposable = {
+                TasksBox(
+                    chipIdsSelected = timelineUiState.selectedChipIDs,
+                    taskDrawingDataList = tasks,
+                    onTaskClicked = onTaskClicked,
+                    onDeleteTaskClicked = viewModel::onDeleteTaskClicked
+                )
+            },
             modifier = Modifier.padding(innerPadding),
         )
     }

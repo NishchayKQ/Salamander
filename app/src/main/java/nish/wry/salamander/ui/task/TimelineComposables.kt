@@ -1,5 +1,6 @@
 package nish.wry.salamander.ui.task
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.combinedClickable
@@ -39,8 +40,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import nish.wry.salamander.ui.task.TimelineScope.taskData
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -49,46 +48,41 @@ import java.util.Locale
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TasksBox(
-    clusterList: List<Cluster>,
+    taskDrawingDataList: List<TaskDrawingData>,
+    chipIdsSelected: Set<Int>,
     onTaskClicked: (Int) -> Unit,
     onDeleteTaskClicked: (Int) -> Unit,
 ) {
     var menuExpanded by remember { mutableIntStateOf(-1) }
     val rectColor = MaterialTheme.colorScheme.primaryContainer
 
-    // TODO maybe flatten clusters and send out processed data from viewmodel
-    clusterList.forEach { cluster: Cluster ->
-        cluster.list.forEach { taskOnGraph: TaskOnGraph ->
+    for (task in taskDrawingDataList) {
+        val renderChip = chipIdsSelected.isEmpty() || task.chipId in chipIdsSelected
+        AnimatedVisibility(renderChip, modifier = task.modifier) {
             Box(
                 modifier = Modifier
                     .combinedClickable(
                         interactionSource = null,
                         indication = LocalIndication.current,
                         onClick = {
-                            onTaskClicked(taskOnGraph.id)
+                            onTaskClicked(task.id)
                             menuExpanded = -1
                         },
                         onLongClick = {
-                            menuExpanded = taskOnGraph.id
+                            menuExpanded = task.id
                         },
                     )
-                    .taskData(
-                        index = taskOnGraph.column,
-                        maxSimultaneous = cluster.maxTaskSimultaneously,
-                        startMins = taskOnGraph.startMins,
-                        endMins = taskOnGraph.endMins
-                    )
                     .drawBehind {
-                        drawRoundRect(color = rectColor, cornerRadius = CornerRadius(12f,12f))
+                        drawRoundRect(color = rectColor, cornerRadius = CornerRadius(12f, 12f))
                     }
                     .fillMaxSize()
             ) {
-                Row(Modifier.padding(4.dp)) { Text(taskOnGraph.name) }
+                Row(Modifier.padding(4.dp)) { Text(task.name) }
 
-                DropdownMenu(expanded = menuExpanded == taskOnGraph.id,
+                DropdownMenu(expanded = menuExpanded == task.id,
                     onDismissRequest = { menuExpanded = -1 }) {
                     DropdownMenuItem(text = { Text("Delete") }, onClick = {
-                        onDeleteTaskClicked(taskOnGraph.id)
+                        onDeleteTaskClicked(task.id)
                         menuExpanded = -1
                     }, leadingIcon = {
                         Icon(
@@ -100,12 +94,11 @@ fun TasksBox(
 
                 }
             }
+
         }
-
     }
-
-
 }
+
 class TaskParentData(
     val index: Int,
     val maxSimultaneous: Int,
@@ -171,12 +164,14 @@ fun HourLabels() {
 
 @Composable
 fun CurrentTimeText() {
-    val df = DateFormat.getTimeInstance(DateFormat.SHORT)
-    var currentTimeText by remember { mutableStateOf(df.format(Date())) }
+    val is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
+    val sdf = SimpleDateFormat(if (is24Hour) "H:m" else "h:m", Locale.getDefault())
+
+    var currentTimeText by remember { mutableStateOf(sdf.format(Date())) }
 
     LaunchedEffect(Unit) {
         while (isActive) {
-            currentTimeText = df.format(Date())
+            currentTimeText = sdf.format(Date())
             delay(60_000)
         }
     }
