@@ -1,6 +1,7 @@
 package nish.wry.salamander.di
 
 import kotlinx.coroutines.flow.Flow
+import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.room.Chip
 import nish.wry.salamander.data.room.ChipDao
 import nish.wry.salamander.data.room.Task
@@ -22,10 +23,13 @@ interface TaskRepository {
 
     fun getTaskWithId(id: Int): Flow<Task>
 
-    fun getTaskForNextThreeDays(
+    fun getTaskForTwoDays(
+        date: Calendar,
+    ): Flow<List<Task>>
+
+    fun getTaskTaskForDay(
         bitmask: Int,
-        startDate: Calendar,
-        endDate: Calendar,
+        date: Calendar,
     ): Flow<List<Task>>
 
     suspend fun createTask(task: Task)
@@ -52,11 +56,25 @@ class OfflineTaskRepository(private val taskDao: TaskDao, private val chipDao: C
 
     override fun getTaskWithId(id: Int): Flow<Task> = taskDao.getTaskWithId(id)
 
-    override fun getTaskForNextThreeDays(
-        bitmask: Int,
-        startDate: Calendar,
-        endDate: Calendar,
-    ): Flow<List<Task>> = taskDao.getTaskForNextThreeDays(bitmask, startDate, endDate)
+    override fun getTaskForTwoDays(
+        date: Calendar,
+    ): Flow<List<Task>> {
+        val dateClone: Calendar = date.clone() as Calendar
+
+        return taskDao.getTasksForTwoDays(
+            bitmask = Week.bitMaskForTodayAndTomorrow(date),
+            startDate = setCalender(date, 0),
+            endDate = setCalender(dateClone, 0, 2)
+        )
+    }
+
+
+    override fun getTaskTaskForDay(bitmask: Int, date: Calendar): Flow<List<Task>> {
+        val dateClone: Calendar = date.clone() as Calendar
+        val startDate = setCalender(dateClone, 0)
+        val endDate = setCalender(date, 24)
+        return taskDao.getTaskForDay(bitmask, startDate, endDate)
+    }
 
     override suspend fun createTask(task: Task) = taskDao.insert(task)
 
@@ -64,4 +82,15 @@ class OfflineTaskRepository(private val taskDao: TaskDao, private val chipDao: C
 
     override suspend fun deleteTask(task: Task) = taskDao.delete(task)
 
+}
+
+private fun setCalender(calendar: Calendar, hour: Int, addDate: Int = 0): Calendar {
+    calendar.set(Calendar.HOUR_OF_DAY, hour)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    if (addDate != 0) {
+        calendar.add(Calendar.DATE, addDate)
+    }
+    return calendar
 }

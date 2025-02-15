@@ -34,8 +34,8 @@ import nish.wry.salamander.ui.screens.MainSuBaseDestination
 import nish.wry.salamander.ui.screens.MainTaskDestination
 import nish.wry.salamander.ui.screens.NishchayScreen
 import nish.wry.salamander.ui.screens.NishchayScreenDestination
+import nish.wry.salamander.ui.screens.TaskScreen
 import nish.wry.salamander.ui.screens.TaskTimelineDestination
-import nish.wry.salamander.ui.screens.TaskTimelineScreen
 import nish.wry.salamander.ui.task.create.CreateTask
 import nish.wry.salamander.ui.task.create.CreateTaskDestination
 
@@ -127,12 +127,15 @@ private fun AppNavHost(
             NavHost(navController = taskNavController, startDestination = TaskTimelineDestination) {
 
                 val taskTimeLineScreen: @Composable (Modifier) -> Unit = { innerModifier ->
-                    TaskTimelineScreen(
+                    TaskScreen(
                         onCreateTaskClicked = { taskNavController.navigate(CreateTaskDestination) },
                         onEditChipClicked = { chipId ->
                             taskNavController.navigate(EditChipDestination(chipId))
                         },
-                        modifier = innerModifier
+                        onTaskClicked = { taskId ->
+                            taskNavController.navigate(EditTaskDestination(taskId))
+                        },
+                        modifier = innerModifier,
                     )
                 }
 

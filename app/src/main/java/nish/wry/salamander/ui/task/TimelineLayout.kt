@@ -7,35 +7,26 @@ import androidx.compose.foundation.gestures.calculateCentroidSize
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -43,54 +34,42 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import nish.wry.salamander.data.Constants
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
 fun TimelineLayout(
     hourLabels: @Composable () -> Unit,
+    dividerBars: @Composable () -> Unit,
     currentTimeComposable: @Composable () -> Unit,
     currentTimeDivider: @Composable () -> Unit,
+    tasksComposable: @Composable () -> Unit,
+    saveScrollAndScale: (scroll: Int, scaleY: Float) -> Unit,
+    scrollValue: Int,
+    scale: Float,
     modifier: Modifier = Modifier,
 ) {
-    var scaleY by rememberSaveable { mutableFloatStateOf(1f) }
-
-    val avgHeight = (scaleY * Constants.HOUR_HEIGHT).dp
+    var scaleY by rememberSaveable { mutableFloatStateOf(scale) }
 
     var cal = Calendar.getInstance()
     var currentTimePos by remember { mutableFloatStateOf(cal[Calendar.HOUR_OF_DAY] + cal[Calendar.MINUTE] / 60f) }
 
+    // FIXME the update does happens after a min, but it might be 59 secs after the minute has changed. Example: update at 9:00:59 so next second current time is 9:01 but app takes a whole minute delay to realise this
     LaunchedEffect(Unit) {
-        while (isActive){
+        while (isActive) {
             cal = Calendar.getInstance()
             currentTimePos = cal[Calendar.HOUR_OF_DAY] + cal[Calendar.MINUTE] / 60f
             delay(60_000)
         }
     }
 
-    val dividerColor = MaterialTheme.colorScheme.onSurfaceVariant
-
-    val dividerBars: @Composable () -> Unit = @Composable {
-        repeat(24) {
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(avgHeight)
-                .drawBehind {
-                    drawLine(
-                        color = dividerColor,
-                        start = Offset.Zero,
-                        end = Offset(size.width, 0f),
-                    )
-                })
+    val scrollState = rememberScrollState(scrollValue)
+    DisposableEffect(Unit) {
+        onDispose {
+            saveScrollAndScale(scrollState.value, scaleY)
         }
     }
-
-    val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
 
     Column(
@@ -98,28 +77,29 @@ fun TimelineLayout(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        Layout(
-            contents = listOf(hourLabels, dividerBars, currentTimeComposable, currentTimeDivider),
-            modifier = modifier
-                .pointerInput(Unit) {
-                    customDetectZoom { centroid, zoomChange ->
-                        val oldScaleY = scaleY
-                        // Constrain min/max zoom
-                        scaleY = (scaleY * zoomChange).coerceIn(0.75f..5f)
+        Layout(contents = listOf(
+            hourLabels, dividerBars, currentTimeComposable, currentTimeDivider, tasksComposable
+        ), modifier = modifier.pointerInput(Unit) {
+            customDetectZoom { centroid, zoomChange ->
+                val oldScaleY = scaleY
+                // Constrain min/max zoom
+                scaleY = (scaleY * zoomChange).coerceIn(0.75f..5f)
 
-                        // Don't move scroll position if no effective zoom occurred
-                        val actualZoom = scaleY / oldScaleY
-                        val scrollY = scrollState.value * actualZoom
+                // Don't move scroll position if no effective zoom occurred
+                val actualZoom = scaleY / oldScaleY
+                val scrollY = scrollState.value * actualZoom
 
-                        val scrollOffset = (zoomChange - 1) * (scrollY - centroid.y)
-                        coroutineScope.launch {
-                            scrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
-                        }
-
-                    }
+                val scrollOffset = (zoomChange - 1) * (scrollY - centroid.y)
+                coroutineScope.launch {
+                    scrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
                 }
 
-        ) { (hoursLabelMeasurables, dividerBarMeasurables, currentTimeMeasurables, currentTimeDividerMeasurables), constraints ->
+            }
+        }
+
+        ) { (hoursLabelMeasurables, dividerBarMeasurables, currentTimeMeasurables, currentTimeDividerMeasurables, tasksMeasurables), constraints ->
+
+            val avgHeight = (scaleY * Constants.HOUR_HEIGHT).dp.toPx().roundToInt()
 
             val hoursPlaceable = hoursLabelMeasurables.map { measurable ->
                 measurable.measure(constraints)
@@ -128,7 +108,12 @@ fun TimelineLayout(
             // note the proper placement height wrt to zoom level is known only to divider
             var totalHeight = 0
             val dividersPlaceable = dividerBarMeasurables.map { measurable ->
-                val placeable = measurable.measure(constraints)
+                val placeable = measurable.measure(
+                    constraints.copy(
+                        minHeight = avgHeight,
+                        maxHeight = avgHeight
+                    )
+                )
                 totalHeight += placeable.height
                 placeable
             }
@@ -139,7 +124,30 @@ fun TimelineLayout(
 
             val totalWidth = dividersPlaceable.first().width
 
+            val xStartOffset = hoursPlaceable.first().width + 15.dp.toPx().roundToInt()
+            val widthAvailableForTasks = dividersPlaceable.first().width - xStartOffset
+
             val singleHourHeight: Int = dividersPlaceable.first().height
+
+            val taskVerticalPadding = 1.dp.toPx().roundToInt()
+            val taskHorizontalPadding = 2.dp.toPx().roundToInt()
+            val tasksPlaceable = tasksMeasurables.map { measurable ->
+                val taskParentData = measurable.parentData as TaskParentData
+                val taskWidth =
+                    (widthAvailableForTasks / taskParentData.maxSimultaneous) - taskHorizontalPadding
+                // we multiply by 2 as we need the padding both on top and bottom
+                val taskHeight =
+                    (((taskParentData.endMins - taskParentData.startMins) * singleHourHeight) / 60) - (2 * taskVerticalPadding)
+                measurable.measure(
+                    Constraints(
+                        minWidth = taskWidth,
+                        maxWidth = taskWidth,
+                        minHeight = taskHeight,
+                        maxHeight = taskHeight
+                    )
+                )
+            }
+
 
             layout(totalWidth, totalHeight) {
                 val xPos = 0
@@ -157,13 +165,27 @@ fun TimelineLayout(
                     dividerPlaceable.place(xPos, yPos)
                     yPos += dividerPlaceable.height
                 }
-                currentTimePlaceable.place(xPos, (currentHourY - currentTimePlaceable.height / 2))
+
+                currentTimePlaceable.place(
+                    xPos, (currentHourY - currentTimePlaceable.height / 2)
+                )
                 currentTimeDividerPlaceable.place(currentTimePlaceable.width, currentHourY)
 
+                tasksPlaceable.forEach { taskPlaceable ->
+                    val taskParentData = taskPlaceable.parentData as TaskParentData
+                    val taskOffset =
+                        ((widthAvailableForTasks / taskParentData.maxSimultaneous) * taskParentData.index)
+
+                    taskPlaceable.place(
+                        x = xStartOffset + taskOffset,
+                        y = ((taskParentData.startMins * singleHourHeight) / 60) + taskVerticalPadding
+                    )
+                }
             }
         }
     }
 }
+
 
 @Preview
 @Composable
@@ -172,9 +194,24 @@ private fun TimelineLayoutPreview() {
         hourLabels = { HourLabels() },
         currentTimeComposable = { CurrentTimeText() },
         currentTimeDivider = { CurrentTimeDivider() },
+        saveScrollAndScale = { _, _ -> },
+        scrollValue = 0,
+        scale = 1.5f,
+        dividerBars = { },
+        tasksComposable = {
+            TasksBox(
+                clusterList = listOf(
+                    Cluster(
+                        mutableListOf(TaskOnGraph(0, "meow", 960, 990)),
+                        maxTaskSimultaneously = 1
+                    )
+                ),
+                onDeleteTaskClicked = {},
+                onTaskClicked = {}
+            )
+        },
     )
 }
-
 
 /**[PointerInputScope.detectTransformGestures] but only consumes the zoom events**/
 private suspend fun PointerInputScope.customDetectZoom(
@@ -206,8 +243,7 @@ private suspend fun PointerInputScope.customDetectZoom(
 //                    val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
 //                    val panMotion = pan.getDistance()
 
-                    if (zoomMotion > touchSlop
-                    ) {
+                    if (zoomMotion > touchSlop) {
                         pastTouchSlop = true
 //                        lockedToPanZoom = panZoomLock && rotationMotion < touchSlop
                     }
@@ -230,75 +266,4 @@ private suspend fun PointerInputScope.customDetectZoom(
     }
 }
 
-@Composable
-fun CurrentTimeDivider() {
-    val errorColor = MaterialTheme.colorScheme.error
 
-    Spacer(modifier = Modifier
-        .fillMaxWidth()
-        .drawWithCache {
-            val path = Path()
-            // both the size of triangle + used for line offset (line starts where triangle ends))
-            val len = 10.dp.toPx()
-            val xPos = 5.dp.toPx()
-
-            path.moveTo(xPos, len / 2)
-            path.lineTo(len + xPos, 0f)
-            path.lineTo(xPos, -len / 2)
-            path.close()
-
-            onDrawBehind {
-                drawLine(
-                    color = errorColor,
-                    start = Offset(len + xPos, 0f),
-                    end = Offset(size.width, 0f),
-                )
-                drawPath(path = path, color = errorColor, style = Fill)
-            }
-        }
-    )
-}
-
-@Composable
-fun HourLabels() {
-    val cal: Calendar = Calendar.getInstance().also { calendar ->
-        calendar.clear()
-        calendar.set(Calendar.HOUR_OF_DAY, 1)
-    }
-    val is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
-    val sdf = SimpleDateFormat(if (is24Hour) "H" else "h a", Locale.getDefault())
-
-    val incHourByOne: () -> String = {
-        val res = sdf.format(cal.time)
-        cal.add(Calendar.HOUR_OF_DAY, 1)
-        res
-    }
-    repeat(24) {
-        Text(
-            incHourByOne(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
-    }
-}
-
-@Composable
-fun CurrentTimeText() {
-    val df = DateFormat.getTimeInstance(DateFormat.SHORT)
-    var currentTimeText by remember { mutableStateOf(df.format(Date())) }
-
-    LaunchedEffect(Unit) {
-        while (isActive) {
-            currentTimeText = df.format(Date())
-            delay(60_000)
-        }
-    }
-
-    val errorColor = MaterialTheme.colorScheme.error
-
-    Text(
-        currentTimeText,
-        style = MaterialTheme.typography.bodySmall,
-        color = errorColor
-    )
-}

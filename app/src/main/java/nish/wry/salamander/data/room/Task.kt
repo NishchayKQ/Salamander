@@ -9,7 +9,7 @@ import java.util.Calendar
 
 //TODO do we need custom onDelete and onUpdate policy?
 
-// TODO do integrity check before adding stuff here, if floatingOffset is null then DateTime needs to set, but if its not null then dateTime = null
+// TODO do integrity check before adding stuff here, if floatingOffset is null then DateTime needs to set, but if offset is not null then dateTime = null and weekdays = 0
 @Entity(
     tableName = "task",
     foreignKeys = [ForeignKey(
@@ -34,7 +34,7 @@ data class Task(
     val dateTime: Calendar? = null,
 
     @ColumnInfo(name = "floating_offset_hours")
-    val floatingOffsetHours: Int? = null,
+    val offsetHours: Int? = null,
 
     val priority: Priority = Priority.Normal,
 )

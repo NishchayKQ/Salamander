@@ -73,6 +73,7 @@ class CreateTaskViewModel(
                 cur.copy(selectedWeekDaysBitmask = cur.selectedWeekDaysBitmask and week.inv())
             }
         }
+        verifyState()
     }
 
     fun onChipSelected(chipId: Int) {
@@ -107,25 +108,37 @@ class CreateTaskViewModel(
         _taskUiStateUiState.update { cur ->
             cur.copy(selectedTime = Calendar.getInstance())
         }
+        verifyState()
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    private fun setCalToTimePickerState(cal: Calendar, timePickerState: TimePickerState): Calendar {
+        cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+        cal.set(Calendar.MINUTE, timePickerState.minute)
+        return cal
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     fun setTime(timePickerState: TimePickerState) {
-        taskUiState.value.selectedTime.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-        taskUiState.value.selectedTime.set(Calendar.MINUTE, timePickerState.minute)
+        _taskUiStateUiState.update { cur ->
+            cur.copy(selectedTime = setCalToTimePickerState(cur.selectedTime, timePickerState))
+        }
         toggleShowTimePicker()
+        verifyState()
     }
 
     fun onTimelessSwitchClick() {
         _taskUiStateUiState.update { cur ->
             cur.copy(timeless = !cur.timeless)
         }
+        verifyState()
     }
 
     fun onSegmentedButtonPriorityClick(priority: Priority) {
         _taskUiStateUiState.update { cur ->
             cur.copy(priority = priority)
         }
+        verifyState()
     }
 
     fun onOffsetTimeChange(inputString: String) {
@@ -144,13 +157,24 @@ class CreateTaskViewModel(
                 }
             }
         }
+        verifyState()
     }
 
     suspend fun onSaveTaskClicked(uiState: ChipOrTaskUiState = taskUiState.value) {
         if (uiState.name.isNotBlank() && uiState.chipId != null) {
-            repository.createTask(uiState.toTask())
+            if (taskId != null) {
+                repository.updateTask(uiState.toTask(taskId))
+            } else {
+                repository.createTask(uiState.toTask())
+            }
             _taskUiStateUiState.update { ChipOrTaskUiState() }
             _uiState.update { UiState() }
+        }
+    }
+
+    private fun verifyState(){
+        _taskUiStateUiState.update { cur->
+            cur.copy(isEntryValid = cur.name.isNotBlank() && cur.chipId != null)
         }
     }
 
@@ -163,12 +187,13 @@ class CreateTaskViewModel(
 }
 
 // TODO we need some default chips that cant be deleted or something in db
-fun ChipOrTaskUiState.toTask(): Task {
+fun ChipOrTaskUiState.toTask(taskId: Int = 0): Task {
     return Task(
+        id = taskId,
         name = name,
         repeatOnDaysBitFlag = if (!timeless) selectedWeekDaysBitmask else 0,
         dateTime = if (!timeless) selectedTime else null,
-        floatingOffsetHours = if (timeless) offsetHours else null,
+        offsetHours = if (timeless) offsetHours else null,
         taskChipId = chipId!!,
         priority = priority
     )
@@ -182,6 +207,6 @@ fun Task.toTaskUiState(): ChipOrTaskUiState =
         selectedWeekDaysBitmask = repeatOnDaysBitFlag,
         priority = priority,
         timeless = dateTime == null,
-        offsetHours = floatingOffsetHours ?: 1,
+        offsetHours = offsetHours ?: 1,
         isEntryValid = false
     )

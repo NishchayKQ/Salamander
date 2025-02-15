@@ -16,11 +16,20 @@ interface TaskDao {
     @Query("select * from task where id = :id")
     fun getTaskWithId(id: Int): Flow<Task>
 
-    @Query("select * from task where (date_time between :startDate and :endDate) or (weekdays_bitflag & :bitmask > 0) order by date_time asc")
-    fun getTaskForNextThreeDays(
+    @Query("select * from task where (date_time between :startDate and :endDate) or (weekdays_bitflag & :bitmask > 0) or (floating_offset_hours is not null)")
+    fun getTasksForTwoDays(
         bitmask: Int,
         startDate: Calendar,
         endDate: Calendar,
+    ): Flow<List<Task>>
+
+//    think order by is not needed cuz some dates are in asc while others are there just cuz weekdays match
+    /**does not return task with offset as it must either have datetime or weekly set neither of which offset task have**/
+    @Query("select * from task where (date_time between :startDate and :endDate) or (weekdays_bitflag & :bitmask > 0)")
+    fun getTaskForDay(
+        bitmask: Int,
+        startDate: Calendar,
+        endDate: Calendar
     ): Flow<List<Task>>
 
     @Insert

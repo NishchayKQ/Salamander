@@ -79,6 +79,7 @@ fun TaskTopAppBar(
                 val chipInteractionSource = remember { MutableInteractionSource() }
                 var menuExpanded by remember { mutableStateOf(false) }
 
+                // double box to override chip's single click support only
                 Box {
                     FilterChip(
                         selected = it.id in selectedChipIds,

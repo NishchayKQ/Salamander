@@ -25,38 +25,41 @@ enum class Week(
         return this.mask or other
     }
 
+    infix fun and(other: Int): Int{
+        return this.mask and other
+    }
+
     fun inv(): Int {
         return this.mask.inv()
     }
+    companion object{
+        fun bitMaskForTodayAndTomorrow(calender: Calendar): Int {
+            val currentDayOfWeek = calender.get(Calendar.DAY_OF_WEEK)
+            val nextDay = giveNextValidWeekdayNumber(currentDayOfWeek)
 
-    fun bitMaskForNextThreeDaysFromToday(calender: Calendar): Int {
-        val currentDayOfWeek = calender.get(Calendar.DAY_OF_WEEK)
-        val nextDay = giveNextValidWeekdayNumber(currentDayOfWeek)
-        val nextNextDay = giveNextValidWeekdayNumber(nextDay)
-        return calenderDayToWeekEnum(currentDayOfWeek) or calenderDayToWeekEnum(nextDay) or (
-                calenderDayToWeekEnum(nextNextDay)
-                )
-    }
-
-    private fun giveNextValidWeekdayNumber(dayOfWeek: Int): Int {
-        return if ((dayOfWeek + 1) % 8 == 0) {
-            1
-        } else {
-            (dayOfWeek + 1) % 8
+            return calenderDayToWeekEnum(currentDayOfWeek) or calenderDayToWeekEnum(nextDay)
         }
-    }
 
-    private fun calenderDayToWeekEnum(dayOfWeek: Int): Week {
-        return when (dayOfWeek) {
-            Calendar.SUNDAY -> SUNDAY
-            Calendar.MONDAY -> MONDAY
-            Calendar.TUESDAY -> TUESDAY
-            Calendar.WEDNESDAY -> WEDNESDAY
-            Calendar.THURSDAY -> THURSDAY
-            Calendar.FRIDAY -> FRIDAY
-            Calendar.SATURDAY -> SATURDAY
-            else -> {
-                throw IllegalArgumentException("dayOfWeek should be in between 1 to 7, was given $dayOfWeek")
+        fun giveNextValidWeekdayNumber(dayOfWeek: Int): Int {
+            return if ((dayOfWeek + 1) % 8 == 0) {
+                1
+            } else {
+                (dayOfWeek + 1) % 8
+            }
+        }
+
+        fun calenderDayToWeekEnum(dayOfWeek: Int): Week {
+            return when (dayOfWeek) {
+                Calendar.SUNDAY -> SUNDAY
+                Calendar.MONDAY -> MONDAY
+                Calendar.TUESDAY -> TUESDAY
+                Calendar.WEDNESDAY -> WEDNESDAY
+                Calendar.THURSDAY -> THURSDAY
+                Calendar.FRIDAY -> FRIDAY
+                Calendar.SATURDAY -> SATURDAY
+                else -> {
+                    throw IllegalArgumentException("dayOfWeek should be in between 1 to 7, was given $dayOfWeek")
+                }
             }
         }
     }

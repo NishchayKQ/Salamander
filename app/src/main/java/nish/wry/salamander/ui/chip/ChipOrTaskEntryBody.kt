@@ -23,7 +23,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -73,7 +72,8 @@ fun ChipOrTaskEntryBody(
 
     val coroutineScope = rememberCoroutineScope()
 
-    val timePickerState = rememberTimePickerState(
+    // remember messes up if edit task is clicked (it doesn't update by the initial values)
+    val timePickerState = TimePickerState(
         initialHour = chipOrTaskUiState.selectedTime.get(Calendar.HOUR_OF_DAY),
         initialMinute = chipOrTaskUiState.selectedTime.get(Calendar.MINUTE),
         is24Hour = DateFormat.is24HourFormat(LocalContext.current)

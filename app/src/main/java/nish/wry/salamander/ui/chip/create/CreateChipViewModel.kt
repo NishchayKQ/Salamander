@@ -21,6 +21,7 @@ import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import java.util.Calendar
 
+// TODO merge both Task and Chip viewmodel with use case...
 class CreateChipViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
@@ -76,6 +77,7 @@ class CreateChipViewModel(
         _chipUiState.update { cur ->
             cur.copy(priority = priority)
         }
+        verifyState()
     }
 
     fun onOffsetTimeChange(inputString: String) {
@@ -89,7 +91,8 @@ class CreateChipViewModel(
             if (number != null) {
                 _chipUiState.update { cur ->
                     cur.copy(
-                        offsetHours = number
+                        offsetHours = number,
+                        isEntryValid = cur.isEntryValid || cur.name.isNotBlank()
                     )
                 }
             }
@@ -104,22 +107,30 @@ class CreateChipViewModel(
                 cur.copy(selectedWeekDaysBitmask = cur.selectedWeekDaysBitmask and week.inv())
             }
         }
+        verifyState()
     }
 
     fun resetSelectedTimeToCurrentTime() {
         _chipUiState.update { cur ->
             cur.copy(selectedTime = Calendar.getInstance())
         }
+        verifyState()
+    }
+
+    // TODO shift common viewmodel? though then states will intermix, better is useCase ig?
+    @OptIn(ExperimentalMaterial3Api::class)
+    private fun setCalToTimePickerState(cal: Calendar, timePickerState: TimePickerState): Calendar {
+        cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+        cal.set(Calendar.MINUTE, timePickerState.minute)
+        return cal
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     fun setTime(timePickerState: TimePickerState) {
-        chipUiState.value.selectedTime.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-        chipUiState.value.selectedTime.set(Calendar.MINUTE, timePickerState.minute)
-
         _chipUiState.update { cur ->
-            cur.copy()
+            cur.copy(selectedTime = setCalToTimePickerState(cur.selectedTime, timePickerState))
         }
+        verifyState()
         toggleShowTimePicker()
     }
 
@@ -127,6 +138,7 @@ class CreateChipViewModel(
         _chipUiState.update { cur ->
             cur.copy(timeless = !cur.timeless)
         }
+        verifyState()
     }
 
     fun toggleShowTimePicker() {
@@ -146,6 +158,11 @@ class CreateChipViewModel(
             _uiState.update { UiState() }
         }
     }
+    private fun verifyState(){
+        _chipUiState.update { cur->
+            cur.copy(isEntryValid = cur.name.isNotBlank() )
+        }
+    }
 
     private companion object {
         private const val CHIP_UI_STATE_KEY = "CHIP_UI_STATE_KEY"
@@ -155,6 +172,7 @@ class CreateChipViewModel(
 
 }
 
+// for verifying valid state just check if name is not blank
 @Parcelize
 data class ChipOrTaskUiState(
     val chipId: Int? = null,

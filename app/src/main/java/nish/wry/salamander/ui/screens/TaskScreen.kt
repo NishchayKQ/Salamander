@@ -1,5 +1,6 @@
 package nish.wry.salamander.ui.screens
 
+import android.content.IntentFilter
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,13 +13,17 @@ import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
+import nish.wry.salamander.ui.task.Cluster
 import nish.wry.salamander.ui.task.CurrentTimeDivider
 import nish.wry.salamander.ui.task.CurrentTimeText
 import nish.wry.salamander.ui.task.HourLabels
+import nish.wry.salamander.ui.task.HourlyDividers
 import nish.wry.salamander.ui.task.TaskBottomAppBar
 import nish.wry.salamander.ui.task.TaskTopAppBar
 import nish.wry.salamander.ui.task.TaskViewModel
+import nish.wry.salamander.ui.task.TasksBox
 import nish.wry.salamander.ui.task.TimelineLayout
+import java.util.Calendar
 
 @Serializable
 object MainTaskDestination : MainDestination {
@@ -30,9 +35,10 @@ object MainTaskDestination : MainDestination {
 object TaskTimelineDestination
 
 @Composable
-fun TaskTimelineScreen(
+fun TaskScreen(
     onCreateTaskClicked: () -> Unit,
     onEditChipClicked: (Int) -> Unit,
+    onTaskClicked: (Int) -> Unit,
     viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
 ) {
@@ -57,11 +63,25 @@ fun TaskTimelineScreen(
         TaskBottomAppBar(onAddTaskClick = onCreateTaskClicked)
     }, modifier = modifier.fillMaxSize()
     ) { innerPadding ->
+        IntentFilter("")
+
+        val taskState by viewModel.currentDayDataFlow.collectAsState()
+        val tasks: List<Cluster> =
+            taskState[Calendar.getInstance()[Calendar.DAY_OF_YEAR]] ?: listOf()
 
         TimelineLayout(
             hourLabels = { HourLabels() },
             currentTimeComposable = { CurrentTimeText() },
             currentTimeDivider = { CurrentTimeDivider() },
+            saveScrollAndScale = viewModel::saveScrollState,
+            scrollValue = timelineUiState.scrollValue,
+            scale = timelineUiState.scale,
+            dividerBars = { HourlyDividers() },
+            tasksComposable = { TasksBox(
+                clusterList = tasks,
+                onTaskClicked = onTaskClicked,
+                onDeleteTaskClicked = viewModel::onDeleteTaskClicked
+            ) },
             modifier = Modifier.padding(innerPadding),
         )
     }
