@@ -25,14 +25,15 @@ enum class Week(
         return this.mask or other
     }
 
-    infix fun and(other: Int): Int{
+    infix fun and(other: Int): Int {
         return this.mask and other
     }
 
     fun inv(): Int {
         return this.mask.inv()
     }
-    companion object{
+
+    companion object {
         fun bitMaskForTodayAndTomorrow(calender: Calendar): Int {
             val currentDayOfWeek = calender.get(Calendar.DAY_OF_WEEK)
             val nextDay = giveNextValidWeekdayNumber(currentDayOfWeek)
@@ -40,12 +41,16 @@ enum class Week(
             return calenderDayToWeekEnum(currentDayOfWeek) or calenderDayToWeekEnum(nextDay)
         }
 
-        fun giveNextValidWeekdayNumber(dayOfWeek: Int): Int {
+        private fun giveNextValidWeekdayNumber(dayOfWeek: Int): Int {
             return if ((dayOfWeek + 1) % 8 == 0) {
                 1
             } else {
                 (dayOfWeek + 1) % 8
             }
+        }
+
+        fun calenderToWeekEnum(calender: Calendar): Week {
+            return calenderDayToWeekEnum(calender[Calendar.DAY_OF_WEEK])
         }
 
         fun calenderDayToWeekEnum(dayOfWeek: Int): Week {

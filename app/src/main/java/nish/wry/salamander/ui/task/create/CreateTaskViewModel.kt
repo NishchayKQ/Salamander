@@ -172,8 +172,8 @@ class CreateTaskViewModel(
         }
     }
 
-    private fun verifyState(){
-        _taskUiStateUiState.update { cur->
+    private fun verifyState() {
+        _taskUiStateUiState.update { cur ->
             cur.copy(isEntryValid = cur.name.isNotBlank() && cur.chipId != null)
         }
     }

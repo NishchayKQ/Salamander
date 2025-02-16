@@ -17,7 +17,7 @@ interface TaskDao {
     fun getTaskWithId(id: Int): Flow<Task>
 
     @Query("select * from task where (date_time between :startDate and :endDate) or (weekdays_bitflag & :bitmask > 0) or (floating_offset_hours is not null)")
-    fun getTasksForTwoDays(
+    fun getTaskForDayIncludingOffsetTask(
         bitmask: Int,
         startDate: Calendar,
         endDate: Calendar,
@@ -29,7 +29,7 @@ interface TaskDao {
     fun getTaskForDay(
         bitmask: Int,
         startDate: Calendar,
-        endDate: Calendar
+        endDate: Calendar,
     ): Flow<List<Task>>
 
     @Insert

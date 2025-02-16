@@ -165,7 +165,7 @@ fun HourLabels() {
 @Composable
 fun CurrentTimeText() {
     val is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
-    val sdf = SimpleDateFormat(if (is24Hour) "H:m" else "h:m", Locale.getDefault())
+    val sdf = SimpleDateFormat(if (is24Hour) "H:mm" else "h:mm", Locale.getDefault())
 
     var currentTimeText by remember { mutableStateOf(sdf.format(Date())) }
 

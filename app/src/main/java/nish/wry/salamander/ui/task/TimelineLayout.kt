@@ -41,6 +41,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun TimelineLayout(
+    isToday: Boolean,
     hourLabels: @Composable () -> Unit,
     dividerBars: @Composable () -> Unit,
     currentTimeComposable: @Composable () -> Unit,
@@ -173,18 +174,20 @@ fun TimelineLayout(
                 val hourTextHeight = hoursPlaceable.first().height
 
                 dividersPlaceable.forEachIndexed { index, dividerPlaceable ->
-                    if ((currentHourY !in yPos..yPos + hourTextHeight) && (currentHourY + timeHeight !in yPos..yPos + hourTextHeight)) {
+                    if (!isToday || ((currentHourY !in yPos..yPos + hourTextHeight) && (currentHourY + timeHeight !in yPos..yPos + hourTextHeight))) {
                         hoursPlaceable[index].place(xPos, yPos)
                     }
                     dividerPlaceable.place(xPos, yPos)
                     yPos += dividerPlaceable.height
                 }
 
-                // place them at top ie last
-                currentTimePlaceable.place(
-                    xPos, (currentHourY - currentTimePlaceable.height / 2)
-                )
-                currentTimeDividerPlaceable.place(currentTimePlaceable.width, currentHourY)
+                if (isToday) {
+                    // place them at top ie last
+                    currentTimePlaceable.place(
+                        xPos, (currentHourY - currentTimePlaceable.height / 2)
+                    )
+                    currentTimeDividerPlaceable.place(currentTimePlaceable.width, currentHourY)
+                }
             }
         }
     }
@@ -195,13 +198,11 @@ fun TimelineLayout(
 @Composable
 private fun TimelineLayoutPreview() {
     TimelineLayout(
+        isToday = true,
         hourLabels = { HourLabels() },
+        dividerBars = { },
         currentTimeComposable = { CurrentTimeText() },
         currentTimeDivider = { CurrentTimeDivider() },
-        saveScrollAndScale = { _, _ -> },
-        scrollValue = 0,
-        scale = 1.5f,
-        dividerBars = { },
         tasksComposable = {
             TasksBox(
                 taskDrawingDataList = listOf(
@@ -222,6 +223,9 @@ private fun TimelineLayoutPreview() {
                 onTaskClicked = {}
             )
         },
+        saveScrollAndScale = { _, _ -> },
+        scrollValue = 0,
+        scale = 1.5f,
     )
 }
 

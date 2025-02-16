@@ -8,20 +8,20 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import nish.wry.salamander.data.Constants
 import nish.wry.salamander.data.MutableSaveStateFlow
-import nish.wry.salamander.data.TaskToTaskDrawingData
+import nish.wry.salamander.data.TaskDataSource
 import nish.wry.salamander.data.room.Chip
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
-import java.util.Calendar
 
 class TaskViewModel(
-    savedStateHandle: SavedStateHandle,
+    val taskDataSource: TaskDataSource,
     private val repository: TaskRepository,
+    savedStateHandle: SavedStateHandle,
     getAllChipsUseCase: GetAllChipsUseCase,
 ) : ViewModel() {
 
@@ -80,23 +80,35 @@ class TaskViewModel(
         }
     }
 
-    private val cal: Calendar = Calendar.getInstance()
+    var goodBoiMap = mutableMapOf<Int, StateFlow<List<TaskDrawingData>>>()
+        private set
 
-    // TODO we can store today's task(or this week's) separately in a variable
-    //  1. always have access to current date's data at a click of a button
-    //  2. we can have query is db with offset == null for the paging integration
-    //  so we don't pull the task we don't have to show (we show offset task only for today
+    init {
+        viewModelScope.launch {
+            addPage(Constants.HALF_PAGE_LIMIT)
 
-    // TODO we can put this in a mutable state that fetches this again whenever day changes thru a
-    //  day change listener (broadcast receiver)
-    val currentDayDataFlow: StateFlow<Map<Int, List<TaskDrawingData>>> =
-        repository.getTaskForTwoDays(date = cal).map { taskList ->
-            TaskToTaskDrawingData(taskList)
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = mapOf()
-        )
+            addPage(Constants.HALF_PAGE_LIMIT + 1)
+            // 1 day before
+            addPage(Constants.HALF_PAGE_LIMIT - 1)
+        }
+    }
+
+    // zero == Constants.PAGER_LIMIT / 2 == 50,000
+    fun addPage(key: Int) {
+        if (key !in goodBoiMap) {
+            goodBoiMap[key] = taskDataSource[key - Constants.HALF_PAGE_LIMIT].stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                listOf()
+            )
+//        TODO check if while subscribed stops indefinitely
+//        }.let { existingFlow ->
+//            if (existingFlow.subscriptionCount.value == 0) {
+//                // Restart collection if stale
+//                existingFlow.reset()
+//            }
+        }
+    }
 
     private companion object {
         private const val TIMELINE_UI_STATE_KEY = "TIMELINE_UI_STATE_KEY"

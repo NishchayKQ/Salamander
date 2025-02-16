@@ -158,9 +158,10 @@ class CreateChipViewModel(
             _uiState.update { UiState() }
         }
     }
-    private fun verifyState(){
-        _chipUiState.update { cur->
-            cur.copy(isEntryValid = cur.name.isNotBlank() )
+
+    private fun verifyState() {
+        _chipUiState.update { cur ->
+            cur.copy(isEntryValid = cur.name.isNotBlank())
         }
     }
 

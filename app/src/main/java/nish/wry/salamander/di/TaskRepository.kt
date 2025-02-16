@@ -23,11 +23,11 @@ interface TaskRepository {
 
     fun getTaskWithId(id: Int): Flow<Task>
 
-    fun getTaskForTwoDays(
+    fun getTaskForDayIncludingOffsetTask(
         date: Calendar,
     ): Flow<List<Task>>
 
-    fun getTaskTaskForDay(
+    fun getTaskForDay(
         bitmask: Int,
         date: Calendar,
     ): Flow<List<Task>>
@@ -56,20 +56,20 @@ class OfflineTaskRepository(private val taskDao: TaskDao, private val chipDao: C
 
     override fun getTaskWithId(id: Int): Flow<Task> = taskDao.getTaskWithId(id)
 
-    override fun getTaskForTwoDays(
+    override fun getTaskForDayIncludingOffsetTask(
         date: Calendar,
     ): Flow<List<Task>> {
         val dateClone: Calendar = date.clone() as Calendar
 
-        return taskDao.getTasksForTwoDays(
-            bitmask = Week.bitMaskForTodayAndTomorrow(date),
+        return taskDao.getTaskForDayIncludingOffsetTask(
+            bitmask = Week.calenderToWeekEnum(date).mask,
             startDate = setCalender(date, 0),
-            endDate = setCalender(dateClone, 0, 2)
+            endDate = setCalender(dateClone, 0, 1)
         )
     }
 
 
-    override fun getTaskTaskForDay(bitmask: Int, date: Calendar): Flow<List<Task>> {
+    override fun getTaskForDay(bitmask: Int, date: Calendar): Flow<List<Task>> {
         val dateClone: Calendar = date.clone() as Calendar
         val startDate = setCalender(dateClone, 0)
         val endDate = setCalender(date, 24)

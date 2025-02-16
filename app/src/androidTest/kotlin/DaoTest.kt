@@ -156,7 +156,7 @@ class DaoTest {
         val cal = Calendar.getInstance()
         cal.clear()
 
-        val task = taskDao.getTasksForTwoDays(bitmask = Week.SATURDAY.mask, startDate = cal, endDate = cal).first()[0]
+        val task = taskDao.getTaskForDayIncludingOffsetTask(bitmask = Week.SATURDAY.mask, startDate = cal, endDate = cal).first()[0]
         assertEquals(task2_oneTimeTask_repeatOnSunMonSat, task)
     }
 
