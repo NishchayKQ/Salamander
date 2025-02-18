@@ -7,4 +7,4 @@
 - dependency injection
 - seperation of concerns design, ui layer, domain layer, data layer
 - type safe navigation using NavGraph
-- 
+- data exposed to ui layer from db using cold flows from room and into hot stateflows when actively used by user
