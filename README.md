@@ -1,0 +1,10 @@
+- multiple viewmodel with viewmodel provider
+- data persistence using room
+- saving state from system init process death using saved state handle
+- custom layout with Layout composable
+- unit testing + instrumental testing
+- adaptive app
+- dependency injection
+- seperation of concerns design, ui layer, domain layer, data layer
+- type safe navigation using NavGraph
+- 
