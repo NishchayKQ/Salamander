@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task
+package nish.wry.salamander.ui.taskTab.timeline
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

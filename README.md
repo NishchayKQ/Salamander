@@ -5,6 +5,7 @@
 - unit testing + instrumental testing
 - adaptive app
 - dependency injection
-- seperation of concerns design, ui layer, domain layer, data layer
+- separation of concerns design, ui layer, domain layer, data layer
 - type safe navigation using NavGraph
-- data exposed to ui layer from db using cold flows from room and into hot stateflows when actively used by user
+- data exposed to ui layer from db using cold flows from room and into hot StateFlows when actively used by user
+- has an algorithm to put task in place as per available space on screen (handling task that occur at the same time)

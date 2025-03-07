@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.flow
 import nish.wry.salamander.data.Constants.MINS_IN_A_DAY
 import nish.wry.salamander.data.room.Task
 import nish.wry.salamander.di.TaskRepository
-import nish.wry.salamander.ui.task.TaskDrawingData
-import nish.wry.salamander.ui.task.TimelineScope.taskData
+import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
+import nish.wry.salamander.ui.taskTab.timeline.TimelineScope.taskData
 import java.util.Calendar
 import java.util.PriorityQueue
 
@@ -23,6 +23,8 @@ class TaskToTaskDrawingData private constructor(private val repository: TaskRepo
         }
     }
 
+    /**days are saved with respect to today,
+     * ie at key=0 its today, at 1 its tomorrow, -1 is yesterday**/
     operator fun get(key: Int): Flow<List<TaskDrawingData>> {
         val cal = Calendar.getInstance()
         cal.add(Calendar.DAY_OF_YEAR, key)

@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task
+package nish.wry.salamander.ui.taskTab.timeline
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -34,7 +34,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import nish.wry.salamander.data.Constants
-import nish.wry.salamander.ui.task.TimelineScope.taskData
+import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
+import nish.wry.salamander.ui.taskTab.timeline.TimelineScope.taskData
 import java.util.Calendar
 import kotlin.math.abs
 import kotlin.math.roundToInt

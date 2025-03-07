@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task
+package nish.wry.salamander.ui.taskTab.main
 
 import android.os.Parcelable
 import androidx.compose.ui.Modifier
@@ -85,18 +85,20 @@ class TaskViewModel(
 
     init {
         viewModelScope.launch {
-            addPage(Constants.HALF_PAGE_LIMIT)
+            val startDate = taskScreenUiState.value.startDate
+            addPage(startDate)
 
-            addPage(Constants.HALF_PAGE_LIMIT + 1)
+            addPage(startDate + 1)
             // 1 day before
-            addPage(Constants.HALF_PAGE_LIMIT - 1)
+            addPage(startDate - 1)
         }
     }
 
-    // zero == Constants.PAGER_LIMIT / 2 == 50,000
+    // our datasource stores data relative to today, like key=0 means today...
+    // so we have to convert it from the pager's way of remembering today to this
     fun addPage(key: Int) {
         if (key !in goodBoiMap) {
-            goodBoiMap[key] = taskDataSource[key - Constants.HALF_PAGE_LIMIT].stateIn(
+            goodBoiMap[key] = taskDataSource[key - taskScreenUiState.value.startDate].stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 listOf()
@@ -129,6 +131,7 @@ data class TimelineUiState(
 data class TaskScreenUiState(
     val query: String = "",
     val expanded: Boolean = false,
+    val startDate: Int = Constants.HALF_PAGE_LIMIT,
 ) : Parcelable
 
 data class TaskDrawingData(

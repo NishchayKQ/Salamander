@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task.create
+package nish.wry.salamander.ui.taskTab.task
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.ui.AppViewModelProvider
-import nish.wry.salamander.ui.chip.ChipOrTaskEntryBody
+import nish.wry.salamander.ui.taskTab.ChipOrTaskEntryBody
 
 @Serializable
 object CreateTaskDestination
@@ -18,8 +18,8 @@ object CreateTaskDestination
 fun CreateTask(
     onCreateChip: () -> Unit,
     exitCreateTask: () -> Unit,
-    viewModel: CreateTaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
+    viewModel: CreateTaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val chips by viewModel.chips.collectAsState()
     val taskUiState by viewModel.taskUiState.collectAsState()

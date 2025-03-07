@@ -25,19 +25,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import nish.wry.salamander.data.Constants
-import nish.wry.salamander.ui.chip.create.CreateChip
-import nish.wry.salamander.ui.chip.create.CreateChipDestination
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import nish.wry.salamander.ui.navigation.EditTaskDestination
 import nish.wry.salamander.ui.screens.MainNishchayDestination
 import nish.wry.salamander.ui.screens.MainSuBaseDestination
-import nish.wry.salamander.ui.screens.MainTaskDestination
 import nish.wry.salamander.ui.screens.NishchayScreen
 import nish.wry.salamander.ui.screens.NishchayScreenDestination
-import nish.wry.salamander.ui.screens.TaskScreen
-import nish.wry.salamander.ui.screens.TaskTimelineDestination
-import nish.wry.salamander.ui.task.create.CreateTask
-import nish.wry.salamander.ui.task.create.CreateTaskDestination
+import nish.wry.salamander.ui.taskTab.chip.CreateChip
+import nish.wry.salamander.ui.taskTab.chip.CreateChipDestination
+import nish.wry.salamander.ui.taskTab.main.MainTaskDestination
+import nish.wry.salamander.ui.taskTab.main.TaskScreen
+import nish.wry.salamander.ui.taskTab.main.TaskTimelineDestination
+import nish.wry.salamander.ui.taskTab.task.CreateTask
+import nish.wry.salamander.ui.taskTab.task.CreateTaskDestination
 
 @Composable
 fun SalamanderApp(
@@ -120,7 +120,7 @@ private fun AppNavHost(
 
     ) {
         composable<MainSuBaseDestination> {
-            val suBaseNavController = rememberNavController()
+//            val suBaseNavController = rememberNavController()
         }
         composable<MainTaskDestination> {
             val taskNavController = rememberNavController()

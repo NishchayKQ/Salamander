@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.screens
+package nish.wry.salamander.ui.taskTab.main
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,14 +21,13 @@ import nish.wry.salamander.R
 import nish.wry.salamander.data.Constants
 import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
-import nish.wry.salamander.ui.task.CurrentTimeDivider
-import nish.wry.salamander.ui.task.CurrentTimeText
-import nish.wry.salamander.ui.task.HourLabels
-import nish.wry.salamander.ui.task.HourlyDividers
-import nish.wry.salamander.ui.task.TaskTopAppBar
-import nish.wry.salamander.ui.task.TaskViewModel
-import nish.wry.salamander.ui.task.TasksBox
-import nish.wry.salamander.ui.task.TimelineLayout
+import nish.wry.salamander.ui.taskTab.TaskTopAppBar
+import nish.wry.salamander.ui.taskTab.timeline.CurrentTimeDivider
+import nish.wry.salamander.ui.taskTab.timeline.CurrentTimeText
+import nish.wry.salamander.ui.taskTab.timeline.HourLabels
+import nish.wry.salamander.ui.taskTab.timeline.HourlyDividers
+import nish.wry.salamander.ui.taskTab.timeline.TasksBox
+import nish.wry.salamander.ui.taskTab.timeline.TimelineLayout
 
 @Serializable
 object MainTaskDestination : MainDestination {
@@ -44,13 +43,15 @@ fun TaskScreen(
     onCreateTaskClicked: () -> Unit,
     onEditChipClicked: (Int) -> Unit,
     onTaskClicked: (Int) -> Unit,
-    viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier,
+    viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val timelineUiState by viewModel.timelineUiState.collectAsState()
     val taskScreenUiState by viewModel.taskScreenUiState.collectAsState()
     val chips by viewModel.chips.collectAsState()
-    val pagerState = rememberPagerState(initialPage = Constants.HALF_PAGE_LIMIT) {
+
+    val startPage = Constants.HALF_PAGE_LIMIT
+    val pagerState = rememberPagerState(initialPage = startPage) {
         Constants.PAGER_LIMIT
     }
     // TODO top app bar?? smaller search bar nag ??
@@ -92,7 +93,7 @@ fun TaskScreen(
 
         HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
             TimelineLayout(
-                isToday = page == Constants.HALF_PAGE_LIMIT,
+                isToday = page == startPage,
                 hourLabels = { HourLabels() },
                 currentTimeComposable = { CurrentTimeText() },
                 currentTimeDivider = { CurrentTimeDivider() },

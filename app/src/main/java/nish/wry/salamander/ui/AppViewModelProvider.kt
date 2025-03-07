@@ -9,9 +9,9 @@ import nish.wry.salamander.data.TaskDataSource
 import nish.wry.salamander.data.TaskToTaskDrawingData
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.SalamanderApplication
-import nish.wry.salamander.ui.chip.create.CreateChipViewModel
-import nish.wry.salamander.ui.task.TaskViewModel
-import nish.wry.salamander.ui.task.create.CreateTaskViewModel
+import nish.wry.salamander.ui.taskTab.chip.CreateChipViewModel
+import nish.wry.salamander.ui.taskTab.main.TaskViewModel
+import nish.wry.salamander.ui.taskTab.task.CreateTaskViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {

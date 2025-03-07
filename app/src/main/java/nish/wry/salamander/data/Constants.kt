@@ -3,7 +3,7 @@ package nish.wry.salamander.data
 import nish.wry.salamander.ui.navigation.MainDestination
 import nish.wry.salamander.ui.screens.MainNishchayDestination
 import nish.wry.salamander.ui.screens.MainSuBaseDestination
-import nish.wry.salamander.ui.screens.MainTaskDestination
+import nish.wry.salamander.ui.taskTab.main.MainTaskDestination
 
 object Constants {
     const val HOUR_HEIGHT = 40

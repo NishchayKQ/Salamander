@@ -1,7 +1,7 @@
 package nish.wry.salamander.data
 
 import kotlinx.coroutines.flow.Flow
-import nish.wry.salamander.ui.task.TaskDrawingData
+import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 
 // TODO
 //  1. next we implement a prefetch and stuff
@@ -18,7 +18,10 @@ class TaskDataSource private constructor(
         return _state.getOrPut(key) { taskDrawingData[key] }
     }
 
-
+    /**
+     * we save days relative to today
+     * day=0 is today, day=1 is tomorrow and day=-1 is yesterday
+     * **/
     operator fun get(key: Int): Flow<List<TaskDrawingData>> {
         return _state[key] ?: fetch(key)
     }

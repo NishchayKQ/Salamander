@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task
+package nish.wry.salamander.ui.taskTab
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable

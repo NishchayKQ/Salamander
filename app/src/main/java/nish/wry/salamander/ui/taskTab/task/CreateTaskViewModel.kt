@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.task.create
+package nish.wry.salamander.ui.taskTab.task
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
@@ -19,9 +19,9 @@ import nish.wry.salamander.data.room.Chip
 import nish.wry.salamander.data.room.Task
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
-import nish.wry.salamander.ui.chip.create.ChipOrTaskUiState
-import nish.wry.salamander.ui.chip.create.UiState
 import nish.wry.salamander.ui.navigation.EditTaskDestination
+import nish.wry.salamander.ui.taskTab.chip.ChipOrTaskUiState
+import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
 
 class CreateTaskViewModel(

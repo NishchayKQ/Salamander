@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.chip
+package nish.wry.salamander.ui.taskTab
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.horizontalScroll
@@ -37,14 +37,14 @@ import nish.wry.salamander.R
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.room.Chip
-import nish.wry.salamander.ui.chip.create.ChipOrTaskUiState
-import nish.wry.salamander.ui.chip.create.UiState
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
 import nish.wry.salamander.ui.common.PrioritySegmentButton
 import nish.wry.salamander.ui.common.SetAndResetTimeButtons
 import nish.wry.salamander.ui.common.TimeInputDialogBox
 import nish.wry.salamander.ui.common.TimeStampText
 import nish.wry.salamander.ui.common.TimelessSwitch
+import nish.wry.salamander.ui.taskTab.chip.ChipOrTaskUiState
+import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)

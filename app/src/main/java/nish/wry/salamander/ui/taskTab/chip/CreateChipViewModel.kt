@@ -1,4 +1,4 @@
-package nish.wry.salamander.ui.chip.create
+package nish.wry.salamander.ui.taskTab.chip
 
 import android.os.Parcelable
 import androidx.compose.material3.ExperimentalMaterial3Api
