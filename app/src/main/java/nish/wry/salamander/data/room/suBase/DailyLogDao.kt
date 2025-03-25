@@ -9,7 +9,6 @@ import java.time.LocalDate
 @Dao
 interface DailyLogDao {
 
-    // TODO this should happen automatically if a day doesn't exist in db, do this repository
     @Insert
     suspend fun addDailyLog(dailyLog: DailyLog)
 
