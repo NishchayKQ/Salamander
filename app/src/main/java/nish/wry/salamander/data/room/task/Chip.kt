@@ -1,4 +1,4 @@
-package nish.wry.salamander.data.room
+package nish.wry.salamander.data.room.task
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,8 +9,10 @@ import java.util.Calendar
 @Entity(tableName = "chip")
 data class Chip(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     val id: Int = 0,
 
+    @ColumnInfo(name = "name")
     val name: String,
 
     @ColumnInfo(name = "weekdays_bitflag")
@@ -22,5 +24,6 @@ data class Chip(
     @ColumnInfo(name = "floating_offset_hours")
     val floatingOffsetHours: Int? = null,
 
+    @ColumnInfo(name = "priority")
     val priority: Priority = Priority.Normal,
 )

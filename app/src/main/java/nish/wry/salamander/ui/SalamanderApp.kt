@@ -28,9 +28,13 @@ import nish.wry.salamander.data.Constants
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import nish.wry.salamander.ui.navigation.EditTaskDestination
 import nish.wry.salamander.ui.screens.MainNishchayDestination
-import nish.wry.salamander.ui.screens.MainSuBaseDestination
+import nish.wry.salamander.ui.suBase.MainSuBaseDestination
 import nish.wry.salamander.ui.screens.NishchayScreen
 import nish.wry.salamander.ui.screens.NishchayScreenDestination
+import nish.wry.salamander.ui.suBase.SuBase
+import nish.wry.salamander.ui.suBase.SuBaseScreenDestination
+import nish.wry.salamander.ui.suBase.category.CreateCategoryDestination
+import nish.wry.salamander.ui.suBase.category.CategoryScreen
 import nish.wry.salamander.ui.taskTab.chip.CreateChip
 import nish.wry.salamander.ui.taskTab.chip.CreateChipDestination
 import nish.wry.salamander.ui.taskTab.main.MainTaskDestination
@@ -116,38 +120,86 @@ private fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     NavHost(
-        navController = navController, startDestination = MainTaskDestination, modifier = modifier
+        navController = navController, startDestination = MainSuBaseDestination, modifier = modifier
 
     ) {
         composable<MainSuBaseDestination> {
-//            val suBaseNavController = rememberNavController()
+            val suBaseNavController = rememberNavController()
+
+            NavHost(navController = suBaseNavController, startDestination = SuBaseScreenDestination){
+                composable<SuBaseScreenDestination> {
+                    SuBase(onAddCategoryClicked = {suBaseNavController.navigate(CreateCategoryDestination)})
+                }
+
+                composable<CreateCategoryDestination> {
+
+                    // TODO shift others to navigate up or whatever appropriate
+                    CategoryScreen(exitScreen = {suBaseNavController.navigateUp()})
+                }
+
+
+            }
+
         }
         composable<MainTaskDestination> {
             val taskNavController = rememberNavController()
-            NavHost(navController = taskNavController, startDestination = TaskTimelineDestination) {
 
-                val taskTimeLineScreen: @Composable (Modifier) -> Unit = { innerModifier ->
-                    TaskScreen(
-                        onCreateTaskClicked = { taskNavController.navigate(CreateTaskDestination) },
-                        onEditChipClicked = { chipId ->
-                            taskNavController.navigate(EditChipDestination(chipId))
-                        },
-                        onTaskClicked = { taskId ->
-                            taskNavController.navigate(EditTaskDestination(taskId))
-                        },
-                        modifier = innerModifier,
-                    )
-                }
+            Row {
+                val dividerModifier = if (isOnlyExpandedWindowSize) Modifier.weight(0.5f)
+                else Modifier
 
-                composable<TaskTimelineDestination> {
-                    taskTimeLineScreen(Modifier)
-                }
+                // or at this destination
+                // TODO expanded screen semantics
+//                if (isOnlyExpandedWindowSize) {
+//                    TaskScreen(
+//                        onCreateTaskClicked = {
+//                            taskNavController.navigate(CreateTaskDestination)
+//                        },
+//                        onEditChipClicked = { chipId ->
+//                            taskNavController.navigate(EditChipDestination(chipId))
+//                        },
+//                        onTaskClicked = { taskId ->
+//                            taskNavController.navigate(EditTaskDestination(taskId))
+//                        },
+//                        modifier = dividerModifier,
+//                    )
+//                }
 
-                composable<CreateTaskDestination> {
-                    Row {
-                        if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.5f))
-                        }
+
+                NavHost(
+                    navController = taskNavController,
+                    startDestination = TaskTimelineDestination
+                ) {
+
+
+                    composable<TaskTimelineDestination> {
+//                        if (!isOnlyExpandedWindowSize) {
+                        TaskScreen(
+                            onCreateTaskClicked = {
+                                taskNavController.navigate(
+                                    CreateTaskDestination
+                                )
+                            },
+                            onEditChipClicked = { chipId ->
+                                taskNavController.navigate(EditChipDestination(chipId))
+                            },
+                            onTaskClicked = { taskId ->
+                                taskNavController.navigate(EditTaskDestination(taskId))
+                            },
+                            modifier = dividerModifier,
+                        )
+//                        } else {
+//                            Column(
+//                                horizontalAlignment = Alignment.CenterHorizontally,
+//                                verticalArrangement = Arrangement.Center,
+//                                modifier = dividerModifier
+//                            ) {
+//                                Text("nothing selected")
+//                            }
+//                        }
+                    }
+
+                    composable<CreateTaskDestination> {
                         CreateTask(
                             onCreateChip = { taskNavController.navigate(CreateChipDestination) },
                             exitCreateTask = {
@@ -155,52 +207,35 @@ private fun AppNavHost(
                                     TaskTimelineDestination, false
                                 )
                             },
-                            modifier = Modifier.weight(0.5f)
+                            modifier = dividerModifier
                         )
                     }
-                }
 
-                composable<CreateChipDestination> {
-                    Row {
-                        if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.5f))
-                        }
+                    composable<CreateChipDestination> {
                         CreateChip(
                             exitChip = {
                                 taskNavController.popBackStack(
                                     CreateTaskDestination, false
                                 )
-                            }, modifier = Modifier.weight(0.5f)
+                            }, modifier = dividerModifier
                         )
                     }
-
-                }
-                composable<EditChipDestination> {
-                    Row {
-                        if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.5f))
-                        }
+                    composable<EditChipDestination> {
                         CreateChip(
                             exitChip = { taskNavController.popBackStack() },
-                            modifier = Modifier.weight(0.5f)
+                            modifier = dividerModifier
                         )
                     }
-                }
-
-                composable<EditTaskDestination> {
-                    Row {
-                        if (isOnlyExpandedWindowSize) {
-                            taskTimeLineScreen(Modifier.weight(0.5f))
-                        }
+                    composable<EditTaskDestination> {
                         CreateTask(
                             onCreateChip = { taskNavController.navigate(CreateChipDestination) },
                             exitCreateTask = { taskNavController.popBackStack() },
-                            modifier = Modifier.weight(0.5f)
+                            modifier = dividerModifier
                         )
                     }
                 }
-
             }
+
         }
 
         composable<MainNishchayDestination> {

@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import nish.wry.salamander.data.room.Chip
+import nish.wry.salamander.data.room.task.Chip
 
 
 class GetAllChipsUseCase(

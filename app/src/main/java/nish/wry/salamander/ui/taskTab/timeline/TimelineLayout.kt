@@ -12,10 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -30,13 +28,11 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import nish.wry.salamander.data.Constants
 import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import nish.wry.salamander.ui.taskTab.timeline.TimelineScope.taskData
-import java.util.Calendar
+import java.time.LocalTime
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -49,26 +45,14 @@ fun TimelineLayout(
     currentTimeDivider: @Composable () -> Unit,
     tasksComposable: @Composable () -> Unit,
     saveScrollAndScale: (scroll: Int, scaleY: Float) -> Unit,
+    currentTimeInHours: Float,
     scrollValue: Int,
     scale: Float,
     modifier: Modifier = Modifier,
 ) {
     var scaleY by rememberSaveable { mutableFloatStateOf(scale) }
-
-    var cal = Calendar.getInstance()
-    var currentTimePos by remember { mutableFloatStateOf(cal[Calendar.HOUR_OF_DAY] + cal[Calendar.MINUTE] / 60f) }
-
-    // FIXME the update does happens after a min, but it might be 59 secs after the minute has changed.
-    //  Example: update at 9:00:59 so next second current time is 9:01 but app takes a whole minute delay to realise this
-    LaunchedEffect(Unit) {
-        while (isActive) {
-            cal = Calendar.getInstance()
-            currentTimePos = cal[Calendar.HOUR_OF_DAY] + cal[Calendar.MINUTE] / 60f
-            delay(60_000)
-        }
-    }
-
     val scrollState = rememberScrollState(scrollValue)
+
     DisposableEffect(Unit) {
         onDispose {
             saveScrollAndScale(scrollState.value, scaleY)
@@ -81,25 +65,26 @@ fun TimelineLayout(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        Layout(contents = listOf(
-            hourLabels, dividerBars, currentTimeComposable, currentTimeDivider, tasksComposable
-        ), modifier = modifier.pointerInput(Unit) {
-            customDetectZoom { centroid, zoomChange ->
-                val oldScaleY = scaleY
-                // Constrain min/max zoom
-                scaleY = (scaleY * zoomChange).coerceIn(0.75f..5f)
+        Layout(
+            contents = listOf(
+                hourLabels, dividerBars, currentTimeComposable, currentTimeDivider, tasksComposable
+            ), modifier = modifier.pointerInput(Unit) {
+                customDetectZoom { centroid, zoomChange ->
+                    val oldScaleY = scaleY
+                    // Constrain min/max zoom
+                    scaleY = (scaleY * zoomChange).coerceIn(0.75f..5f)
 
-                // Don't move scroll position if no effective zoom occurred
-                val actualZoom = scaleY / oldScaleY
-                val scrollY = scrollState.value * actualZoom
+                    // Don't move scroll position if no effective zoom occurred
+                    val actualZoom = scaleY / oldScaleY
+                    val scrollY = scrollState.value * actualZoom
 
-                val scrollOffset = (zoomChange - 1) * (scrollY - centroid.y)
-                coroutineScope.launch {
-                    scrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+                    val scrollOffset = (zoomChange - 1) * (scrollY - centroid.y)
+                    coroutineScope.launch {
+                        scrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+                    }
+
                 }
-
             }
-        }
 
         ) { (hoursLabelMeasurables, dividerBarMeasurables, currentTimeMeasurables, currentTimeDividerMeasurables, tasksMeasurables), constraints ->
 
@@ -169,7 +154,7 @@ fun TimelineLayout(
                 val xPos = 0
                 var yPos = singleHourHeight
                 // fractional hour length (5:30am = 5.5hrs) * length of each hour
-                val currentHourY = (currentTimePos * singleHourHeight).roundToInt()
+                val currentHourY = (currentTimeInHours * singleHourHeight).roundToInt()
 
                 val timeHeight = currentTimePlaceable.height - 8.dp.toPx().roundToInt()
                 val hourTextHeight = hoursPlaceable.first().height
@@ -198,11 +183,12 @@ fun TimelineLayout(
 @Preview
 @Composable
 private fun TimelineLayoutPreview() {
+    val is24Hour = false
     TimelineLayout(
         isToday = true,
-        hourLabels = { HourLabels() },
+        hourLabels = { HourLabels(is24Hour = is24Hour) },
         dividerBars = { },
-        currentTimeComposable = { CurrentTimeText() },
+        currentTimeComposable = { CurrentTimeText(is24Hour, LocalTime.now()) },
         currentTimeDivider = { CurrentTimeDivider() },
         tasksComposable = {
             TasksBox(
@@ -224,6 +210,7 @@ private fun TimelineLayoutPreview() {
                 onTaskClicked = {}
             )
         },
+        currentTimeInHours = 7f,
         saveScrollAndScale = { _, _ -> },
         scrollValue = 0,
         scale = 1.5f,

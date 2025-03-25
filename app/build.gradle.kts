@@ -42,6 +42,11 @@ android {
         }
     }
     compileOptions {
+        // Flag to enable support for the new language APIs
+        // For AGP 4.1+
+        isCoreLibraryDesugaringEnabled = true
+
+        // Sets Java compatibility to Java 8
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -95,4 +100,9 @@ dependencies {
 
     // for window size class
     implementation(libs.androidx.material3.window.size)
+
+    // see https://developer.android.com/studio/write/java8-support#library-desugaring
+    // from https://stackoverflow.com/questions/56695997/how-to-fix-call-requires-api-level-26-current-min-is-25-error-in-android
+    // For AGP 7.4+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

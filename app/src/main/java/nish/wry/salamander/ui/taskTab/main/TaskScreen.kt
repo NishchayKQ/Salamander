@@ -48,6 +48,8 @@ fun TaskScreen(
 ) {
     val timelineUiState by viewModel.timelineUiState.collectAsState()
     val taskScreenUiState by viewModel.taskScreenUiState.collectAsState()
+    val localTime by viewModel.localTime.collectAsState()
+    val is24Hour by viewModel.is24Hour.collectAsState()
     val chips by viewModel.chips.collectAsState()
 
     val startPage = Constants.HALF_PAGE_LIMIT
@@ -94,10 +96,11 @@ fun TaskScreen(
         HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
             TimelineLayout(
                 isToday = page == startPage,
-                hourLabels = { HourLabels() },
-                currentTimeComposable = { CurrentTimeText() },
+                hourLabels = { HourLabels(is24Hour) },
+                currentTimeComposable = { CurrentTimeText(is24Hour, localTime) },
                 currentTimeDivider = { CurrentTimeDivider() },
                 saveScrollAndScale = viewModel::saveScrollState,
+                currentTimeInHours = (localTime.minute / 60f) + localTime.hour,
                 scrollValue = timelineUiState.scrollValue,
                 scale = timelineUiState.scale,
                 dividerBars = { HourlyDividers() },

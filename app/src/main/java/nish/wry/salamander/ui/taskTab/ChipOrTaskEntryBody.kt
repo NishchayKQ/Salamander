@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
 import nish.wry.salamander.R
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
-import nish.wry.salamander.data.room.Chip
+import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
 import nish.wry.salamander.ui.common.PrioritySegmentButton
 import nish.wry.salamander.ui.common.SetAndResetTimeButtons
@@ -63,10 +64,10 @@ fun ChipOrTaskEntryBody(
     setOrResetBitFlagForWeekday: (Boolean, Week) -> Unit,
     saveData: suspend () -> Unit,
     onExitRequested: () -> Unit,
+    modifier: Modifier = Modifier,
     chips: List<Chip>? = null,
     onCreateChip: (() -> Unit)? = null,
     onChipSelected: ((Int) -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     val isTaskScreen = onCreateChip != null
 
@@ -156,7 +157,7 @@ fun ChipOrTaskEntryBody(
             }
 
             if (!chipOrTaskUiState.timeless) {
-                TextField(
+                OutlinedTextField(
                     value = uiState.fastTimeIoInput,
                     onValueChange = onFastIoInputChange,
                     label = { Text(stringResource(R.string.fast_time_io)) },

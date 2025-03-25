@@ -5,11 +5,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import nish.wry.salamander.data.Week
-import nish.wry.salamander.data.room.Chip
-import nish.wry.salamander.data.room.ChipDao
+import nish.wry.salamander.data.room.task.Chip
+import nish.wry.salamander.data.room.task.ChipDao
 import nish.wry.salamander.data.room.SalamanderRoomDatabase
-import nish.wry.salamander.data.room.Task
-import nish.wry.salamander.data.room.TaskDao
+import nish.wry.salamander.data.room.task.Task
+import nish.wry.salamander.data.room.task.TaskDao
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -74,7 +74,7 @@ class DaoTest {
             id = 1,
             name = "go to college 💀 at 4am",
             dateTime = calendar,
-            taskChipId = 1
+            chipId = 1
         )
 
         calendar.clear()
@@ -86,7 +86,7 @@ class DaoTest {
             name = "buy bread 🍞",
             dateTime = calendar,
             repeatOnDaysBitFlag = Week.SUNDAY or (Week.MONDAY or Week.SATURDAY),
-            taskChipId = 2
+            chipId = 2
         )
 
 

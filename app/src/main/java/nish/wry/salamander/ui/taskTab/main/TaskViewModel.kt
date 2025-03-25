@@ -12,15 +12,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import nish.wry.salamander.data.Constants
+import nish.wry.salamander.data.DateTimeTracker
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.TaskDataSource
-import nish.wry.salamander.data.room.Chip
+import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
+import java.time.LocalTime
 
 class TaskViewModel(
     val taskDataSource: TaskDataSource,
     private val repository: TaskRepository,
+    dateTimeTracker: DateTimeTracker,
     savedStateHandle: SavedStateHandle,
     getAllChipsUseCase: GetAllChipsUseCase,
 ) : ViewModel() {
@@ -56,6 +59,11 @@ class TaskViewModel(
 
     // chips
     val chips: StateFlow<List<Chip>> = getAllChipsUseCase(viewModelScope)
+
+    val localTime: StateFlow<LocalTime> = dateTimeTracker.currentTime
+    val is24Hour: StateFlow<Boolean> = dateTimeTracker.is24Hour
+
+//    val localDate:Nothing = dateTimeTracker.currentDate.collect { }
 
     fun onChipClicked(chipId: Int) {
         _timelineUiState.update { cur ->

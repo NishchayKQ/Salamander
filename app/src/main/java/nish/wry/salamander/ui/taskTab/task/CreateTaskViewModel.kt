@@ -15,8 +15,8 @@ import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
-import nish.wry.salamander.data.room.Chip
-import nish.wry.salamander.data.room.Task
+import nish.wry.salamander.data.room.task.Chip
+import nish.wry.salamander.data.room.task.Task
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.navigation.EditTaskDestination
@@ -194,14 +194,14 @@ fun ChipOrTaskUiState.toTask(taskId: Int = 0): Task {
         repeatOnDaysBitFlag = if (!timeless) selectedWeekDaysBitmask else 0,
         dateTime = if (!timeless) selectedTime else null,
         offsetHours = if (timeless) offsetHours else null,
-        taskChipId = chipId!!,
+        chipId = chipId!!,
         priority = priority
     )
 }
 
 fun Task.toTaskUiState(): ChipOrTaskUiState =
     ChipOrTaskUiState(
-        chipId = taskChipId,
+        chipId = chipId,
         name = name,
         selectedTime = dateTime ?: Calendar.getInstance(),
         selectedWeekDaysBitmask = repeatOnDaysBitFlag,

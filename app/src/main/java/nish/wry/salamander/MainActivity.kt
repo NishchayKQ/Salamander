@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
+import nish.wry.salamander.di.SalamanderApplication
 import nish.wry.salamander.ui.SalamanderApp
 import nish.wry.salamander.ui.theme.SalamanderTheme
 
@@ -25,6 +26,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        // TODO is this ok?
+       (application as SalamanderApplication).container.dateTimeTracker.refresh()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (application as SalamanderApplication).container.dateTimeTracker.stop()
     }
 }
 

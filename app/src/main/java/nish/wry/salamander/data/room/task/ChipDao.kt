@@ -1,4 +1,4 @@
-package nish.wry.salamander.data.room
+package nish.wry.salamander.data.room.task
 
 import androidx.room.Dao
 import androidx.room.Delete

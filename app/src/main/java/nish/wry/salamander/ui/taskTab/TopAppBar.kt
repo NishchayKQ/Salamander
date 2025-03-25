@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import nish.wry.salamander.R
-import nish.wry.salamander.data.room.Chip
+import nish.wry.salamander.data.room.task.Chip
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

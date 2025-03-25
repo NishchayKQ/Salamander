@@ -1,4 +1,4 @@
-package nish.wry.salamander.data.room
+package nish.wry.salamander.data.room.task
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -8,7 +8,7 @@ import nish.wry.salamander.data.Priority
 import java.util.Calendar
 
 //TODO do we need custom onDelete and onUpdate policy?
-
+// TODO index others?
 // TODO do integrity check before adding stuff here, if floatingOffset is null then DateTime needs to set, but if offset is not null then dateTime = null and weekdays = 0
 @Entity(
     tableName = "task",
@@ -20,11 +20,13 @@ import java.util.Calendar
 )
 data class Task(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     val id: Int = 0,
 
     @ColumnInfo(name = "task_chip", index = true)
-    val taskChipId: Int,
+    val chipId: Int,
 
+    @ColumnInfo(name = "name")
     val name: String,
 
     @ColumnInfo(name = "weekdays_bitflag")
@@ -36,5 +38,6 @@ data class Task(
     @ColumnInfo(name = "floating_offset_hours")
     val offsetHours: Int? = null,
 
+    @ColumnInfo(name = "priority")
     val priority: Priority = Priority.Normal,
 )

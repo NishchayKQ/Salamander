@@ -20,11 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -35,15 +33,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.layout.ParentDataModifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import java.text.SimpleDateFormat
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -80,7 +76,8 @@ fun TasksBox(
             ) {
                 Row(Modifier.padding(4.dp)) { Text(task.name) }
 
-                DropdownMenu(expanded = menuExpanded == task.id,
+                DropdownMenu(
+                    expanded = menuExpanded == task.id,
                     onDismissRequest = { menuExpanded = -1 }) {
                     DropdownMenuItem(text = { Text("Delete") }, onClick = {
                         onDeleteTaskClicked(task.id)
@@ -128,25 +125,25 @@ object TimelineScope {
 fun HourlyDividers() {
     val dividerColor = MaterialTheme.colorScheme.onSurfaceVariant
     repeat(24) {
-        Spacer(modifier = Modifier
-            .fillMaxSize()
-            .drawBehind {
-                drawLine(
-                    color = dividerColor,
-                    start = Offset.Zero,
-                    end = Offset(size.width, 0f),
-                )
-            })
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind {
+                    drawLine(
+                        color = dividerColor,
+                        start = Offset.Zero,
+                        end = Offset(size.width, 0f),
+                    )
+                })
     }
 }
 
 @Composable
-fun HourLabels() {
+fun HourLabels(is24Hour: Boolean) {
     val cal: Calendar = Calendar.getInstance().also { calendar ->
         calendar.clear()
         calendar.set(Calendar.HOUR_OF_DAY, 1)
     }
-    val is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
     val sdf = SimpleDateFormat(if (is24Hour) "H" else "h a", Locale.getDefault())
 
     val incHourByOne: () -> String = {
@@ -164,23 +161,16 @@ fun HourLabels() {
 }
 
 @Composable
-fun CurrentTimeText() {
-    val is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
-    val sdf = SimpleDateFormat(if (is24Hour) "H:mm" else "h:mm", Locale.getDefault())
-
-    var currentTimeText by remember { mutableStateOf(sdf.format(Date())) }
-
-    LaunchedEffect(Unit) {
-        while (isActive) {
-            currentTimeText = sdf.format(Date())
-            delay(60_000)
-        }
-    }
+fun CurrentTimeText(
+    is24Hour: Boolean,
+    localTime: LocalTime,
+) {
+    val dtf = DateTimeFormatter.ofPattern(if (is24Hour) "H:mm" else "h:mm", Locale.getDefault())
 
     val errorColor = MaterialTheme.colorScheme.error
 
     Text(
-        currentTimeText, style = MaterialTheme.typography.bodySmall, color = errorColor
+        localTime.format(dtf), style = MaterialTheme.typography.bodySmall, color = errorColor
     )
 }
 
@@ -188,26 +178,27 @@ fun CurrentTimeText() {
 fun CurrentTimeDivider() {
     val errorColor = MaterialTheme.colorScheme.error
 
-    Spacer(modifier = Modifier
-        .fillMaxWidth()
-        .drawWithCache {
-            val path = Path()
-            // both the size of triangle + used for line offset (line starts where triangle ends))
-            val len = 10.dp.toPx()
-            val xPos = 5.dp.toPx()
+    Spacer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .drawWithCache {
+                val path = Path()
+                // both the size of triangle + used for line offset (line starts where triangle ends))
+                val len = 10.dp.toPx()
+                val xPos = 5.dp.toPx()
 
-            path.moveTo(xPos, len / 2)
-            path.lineTo(len + xPos, 0f)
-            path.lineTo(xPos, -len / 2)
-            path.close()
+                path.moveTo(xPos, len / 2)
+                path.lineTo(len + xPos, 0f)
+                path.lineTo(xPos, -len / 2)
+                path.close()
 
-            onDrawBehind {
-                drawLine(
-                    color = errorColor,
-                    start = Offset(len + xPos, 0f),
-                    end = Offset(size.width, 0f),
-                )
-                drawPath(path = path, color = errorColor, style = Fill)
-            }
-        })
+                onDrawBehind {
+                    drawLine(
+                        color = errorColor,
+                        start = Offset(len + xPos, 0f),
+                        end = Offset(size.width, 0f),
+                    )
+                    drawPath(path = path, color = errorColor, style = Fill)
+                }
+            })
 }

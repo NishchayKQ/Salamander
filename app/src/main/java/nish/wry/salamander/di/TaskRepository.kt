@@ -2,10 +2,10 @@ package nish.wry.salamander.di
 
 import kotlinx.coroutines.flow.Flow
 import nish.wry.salamander.data.Week
-import nish.wry.salamander.data.room.Chip
-import nish.wry.salamander.data.room.ChipDao
-import nish.wry.salamander.data.room.Task
-import nish.wry.salamander.data.room.TaskDao
+import nish.wry.salamander.data.room.task.Chip
+import nish.wry.salamander.data.room.task.ChipDao
+import nish.wry.salamander.data.room.task.Task
+import nish.wry.salamander.data.room.task.TaskDao
 import java.util.Calendar
 
 interface TaskRepository {

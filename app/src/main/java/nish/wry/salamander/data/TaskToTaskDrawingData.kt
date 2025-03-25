@@ -4,13 +4,14 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import nish.wry.salamander.data.Constants.MINS_IN_A_DAY
-import nish.wry.salamander.data.room.Task
+import nish.wry.salamander.data.room.task.Task
 import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import nish.wry.salamander.ui.taskTab.timeline.TimelineScope.taskData
 import java.util.Calendar
 import java.util.PriorityQueue
 
+// TODO LocalDate.ofEpochDay()
 class TaskToTaskDrawingData private constructor(private val repository: TaskRepository) {
     companion object {
         @Volatile
@@ -84,7 +85,7 @@ class TaskToTaskDrawingData private constructor(private val repository: TaskRepo
                         name = task.name,
                         startMins = startMins!!,
                         endMins = startMins + Constants.TASK_DURATION,
-                        chipId = task.taskChipId
+                        chipId = task.chipId
                     )
                 )
             } else {
@@ -95,7 +96,7 @@ class TaskToTaskDrawingData private constructor(private val repository: TaskRepo
                             name = task.name,
                             startMins = startMins!!,
                             endMins = startMins + Constants.TASK_DURATION,
-                            chipId = task.taskChipId
+                            chipId = task.chipId
                         )
                     )
                 } else {
@@ -112,7 +113,7 @@ class TaskToTaskDrawingData private constructor(private val repository: TaskRepo
                                 name = task.name,
                                 startMins = effectiveStartMins,
                                 endMins = effectiveStartMins + Constants.TASK_DURATION,
-                                chipId = task.taskChipId
+                                chipId = task.chipId
                             )
                         )
                     }

@@ -2,6 +2,8 @@ package nish.wry.salamander.data.room
 
 import androidx.room.TypeConverter
 import nish.wry.salamander.data.Priority
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Calendar
 
 class Converters {
@@ -31,4 +33,23 @@ class Converters {
         return Priority.priorityById(id)
     }
 
+    @TypeConverter
+    fun localDateToLong(localDate: LocalDate): Long {
+        return localDate.toEpochDay()
+    }
+
+    @TypeConverter
+    fun longToLocalDate(long: Long): LocalDate {
+        return LocalDate.ofEpochDay(long)
+    }
+
+    @TypeConverter
+    fun localTimeToInt(localTime: LocalTime): Int{
+        return localTime.toSecondOfDay()
+    }
+
+    @TypeConverter
+    fun intToLocalTime(int: Int):LocalTime{
+        return LocalTime.ofSecondOfDay(int.toLong())
+    }
 }
