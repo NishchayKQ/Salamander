@@ -11,25 +11,27 @@ plugins {
     id("kotlin-parcelize")
 }
 
+// https://developer.android.com/jetpack/androidx/releases/room#gradle-plugin
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+
 android {
     namespace = "nish.wry.salamander"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "nish.wry.salamander"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-
     }
 
     buildTypes {
@@ -105,4 +107,21 @@ dependencies {
     // from https://stackoverflow.com/questions/56695997/how-to-fix-call-requires-api-level-26-current-min-is-25-error-in-android
     // For AGP 7.4+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+//    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+//
+//
+//    implementation("org.jetbrains.skiko:skiko:0.8.4")
+//    // The host OS and architecture should be specified explicitly.
+//    implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-x64:0.8.4")
+//
+//    // Lets-Plot Kotlin API
+//    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-kernel:4.9.3")
+//
+//    // Lets-Plot Multiplatform
+//    implementation("org.jetbrains.lets-plot:lets-plot-common:4.5.2")
+//    implementation("org.jetbrains.lets-plot:platf-awt:4.5.2")
+//
+//    // Lets-Plot Skia Frontend
+//    implementation("org.jetbrains.lets-plot:lets-plot-swing-skia:2.1.1")
 }
