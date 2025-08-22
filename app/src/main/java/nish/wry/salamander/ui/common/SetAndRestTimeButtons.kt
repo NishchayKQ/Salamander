@@ -19,16 +19,18 @@ fun SetAndResetTimeButtons(
     toggleShowTimePicker: () -> Unit,
     onResetTimeButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    disabled: Boolean = false,
 ) {
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
         Button(
             onClick = toggleShowTimePicker,
+            enabled = !disabled,
             modifier = Modifier.padding(end = 8.dp)
         ) { Text(stringResource(R.string.set_time)) }
 
-        TextButton(onClick = onResetTimeButtonClicked) {
+        TextButton(onClick = onResetTimeButtonClicked, enabled = !disabled) {
             Text("Reset time")
         }
 

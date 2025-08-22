@@ -19,6 +19,7 @@ fun DaysOfTheWeekIconButtons(
     selectedWeekDaysBitmask: Int,
     setOrResetBitFlagForWeekday: (bool: Boolean, week: Week) -> Unit,
     modifier: Modifier = Modifier,
+    disabled: Boolean = false,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
         Week.entries.forEachIndexed { index, week ->
@@ -30,16 +31,17 @@ fun DaysOfTheWeekIconButtons(
                 onCheckedChange = { value ->
                     setOrResetBitFlagForWeekday(value, week)
                 },
+                enabled = !disabled,
                 colors = IconButtonDefaults.outlinedIconToggleButtonColors(
                     containerColor = Color.Transparent,
                     checkedContainerColor = Color.Transparent,
                     checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
                 ),
                 border =
-                if (toggledOn) BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.onTertiaryContainer
-                ) else null
+                    if (toggledOn) BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.onTertiaryContainer
+                    ) else null
             ) {
                 Text(
                     text = week.letter, color = if (index == 6) {

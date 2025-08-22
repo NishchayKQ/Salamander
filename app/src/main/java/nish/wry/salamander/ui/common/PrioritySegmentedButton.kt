@@ -13,12 +13,14 @@ fun PrioritySegmentButton(
     selectedPriority: Priority,
     changePriority: (Priority) -> Unit,
     modifier: Modifier = Modifier,
+    disabled: Boolean = false,
 ) {
     SingleChoiceSegmentedButtonRow(modifier = modifier) {
         Priority.entries.forEachIndexed { index: Int, priority: Priority ->
             SegmentedButton(
                 selected = selectedPriority == priority,
                 onClick = { changePriority(priority) },
+                enabled = !disabled,
                 shape = SegmentedButtonDefaults.itemShape(
                     index = index,
                     count = Priority.entries.count()

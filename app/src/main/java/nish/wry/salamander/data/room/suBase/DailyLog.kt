@@ -10,7 +10,7 @@ import java.time.LocalDate
  * this date is attached to each [ActivityInterval] via foreign key
  *
  * @param dayId: auto incrementing primary key
- * @param date a [LocalDate] date it refers to
+ * @param date a [LocalDate] date it refers to. stored as [LocalDate.toEpochDay] in db
  * @param note some note for the day user can attach
  * **/
 @Entity(tableName = "daily_log")

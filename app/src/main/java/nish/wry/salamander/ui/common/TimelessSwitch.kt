@@ -24,6 +24,7 @@ fun TimelessSwitch(
     checked: Boolean,
     onSwitchToggle: () -> Unit,
     modifier: Modifier = Modifier,
+    disabled: Boolean = false
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Row(
@@ -32,7 +33,8 @@ fun TimelessSwitch(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = onSwitchToggle
+                onClick = onSwitchToggle,
+                enabled = !disabled
             )
             .padding(start = 32.dp, end = 32.dp)
     ) {

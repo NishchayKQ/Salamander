@@ -20,7 +20,7 @@ import nish.wry.salamander.data.room.task.Task
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.navigation.EditTaskDestination
-import nish.wry.salamander.ui.taskTab.chip.ChipOrTaskUiState
+import nish.wry.salamander.ui.taskTab.chip.GenericTaskOrChipUiState
 import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
 
@@ -53,7 +53,7 @@ class CreateTaskViewModel(
         MutableSaveStateFlow(
             savedStateHandle = savedStateHandle,
             key = TASK_UI_STATE_KEY,
-            defaultValue = ChipOrTaskUiState()
+            defaultValue = GenericTaskOrChipUiState()
         )
     val taskUiState = _taskUiStateUiState.asStateFlow()
 
@@ -160,14 +160,14 @@ class CreateTaskViewModel(
         verifyState()
     }
 
-    suspend fun onSaveTaskClicked(uiState: ChipOrTaskUiState = taskUiState.value) {
+    suspend fun onSaveTaskClicked(uiState: GenericTaskOrChipUiState = taskUiState.value) {
         if (uiState.name.isNotBlank() && uiState.chipId != null) {
             if (taskId != null) {
                 repository.updateTask(uiState.toTask(taskId))
             } else {
                 repository.createTask(uiState.toTask())
             }
-            _taskUiStateUiState.update { ChipOrTaskUiState() }
+            _taskUiStateUiState.update { GenericTaskOrChipUiState() }
             _uiState.update { UiState() }
         }
     }
@@ -187,7 +187,7 @@ class CreateTaskViewModel(
 }
 
 // TODO we need some default chips that cant be deleted or something in db
-fun ChipOrTaskUiState.toTask(taskId: Int = 0): Task {
+fun GenericTaskOrChipUiState.toTask(taskId: Int = 0): Task {
     return Task(
         id = taskId,
         name = name,
@@ -199,8 +199,8 @@ fun ChipOrTaskUiState.toTask(taskId: Int = 0): Task {
     )
 }
 
-fun Task.toTaskUiState(): ChipOrTaskUiState =
-    ChipOrTaskUiState(
+fun Task.toTaskUiState(): GenericTaskOrChipUiState =
+    GenericTaskOrChipUiState(
         chipId = chipId,
         name = name,
         selectedTime = dateTime ?: Calendar.getInstance(),

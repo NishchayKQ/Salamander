@@ -26,7 +26,7 @@ fun CreateTask(
     val uiState by viewModel.uiState.collectAsState()
 
     ChipOrTaskEntryBody(
-        chipOrTaskUiState = taskUiState,
+        genericTaskOrChipUiState = taskUiState,
         uiState = uiState,
         onNameChange = viewModel::onTaskNameChange,
         onSegmentedButtonPriorityClick = viewModel::onSegmentedButtonPriorityClick,

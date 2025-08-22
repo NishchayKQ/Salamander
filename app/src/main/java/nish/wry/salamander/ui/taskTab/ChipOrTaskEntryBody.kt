@@ -21,6 +21,7 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePickerState
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import nish.wry.salamander.R
 import nish.wry.salamander.data.Priority
@@ -44,14 +46,15 @@ import nish.wry.salamander.ui.common.SetAndResetTimeButtons
 import nish.wry.salamander.ui.common.TimeInputDialogBox
 import nish.wry.salamander.ui.common.TimeStampText
 import nish.wry.salamander.ui.common.TimelessSwitch
-import nish.wry.salamander.ui.taskTab.chip.ChipOrTaskUiState
+import nish.wry.salamander.ui.taskTab.chip.GenericTaskOrChipUiState
 import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChipOrTaskEntryBody(
-    chipOrTaskUiState: ChipOrTaskUiState,
+    genericTaskOrChipUiState: GenericTaskOrChipUiState,
     uiState: UiState,
     onNameChange: (String) -> Unit,
     onSegmentedButtonPriorityClick: (Priority) -> Unit,
@@ -68,6 +71,7 @@ fun ChipOrTaskEntryBody(
     chips: List<Chip>? = null,
     onCreateChip: (() -> Unit)? = null,
     onChipSelected: ((Int) -> Unit)? = null,
+    onForGroupingOnlyToggled: ((Boolean) -> Unit)? = null,
 ) {
     val isTaskScreen = onCreateChip != null
 
@@ -75,8 +79,8 @@ fun ChipOrTaskEntryBody(
 
     // remember messes up if edit task is clicked (it doesn't update by the initial values)
     val timePickerState = TimePickerState(
-        initialHour = chipOrTaskUiState.selectedTime.get(Calendar.HOUR_OF_DAY),
-        initialMinute = chipOrTaskUiState.selectedTime.get(Calendar.MINUTE),
+        initialHour = genericTaskOrChipUiState.selectedTime.get(Calendar.HOUR_OF_DAY),
+        initialMinute = genericTaskOrChipUiState.selectedTime.get(Calendar.MINUTE),
         is24Hour = DateFormat.is24HourFormat(LocalContext.current)
     )
 
@@ -88,7 +92,7 @@ fun ChipOrTaskEntryBody(
                 .padding(innerPadding)
         ) {
             TextField(
-                value = chipOrTaskUiState.name,
+                value = genericTaskOrChipUiState.name,
                 onValueChange = onNameChange,
                 label = { Text(stringResource(if (isTaskScreen) R.string.task_name else R.string.chip_name)) },
                 modifier = Modifier
@@ -99,20 +103,34 @@ fun ChipOrTaskEntryBody(
                         end = 16.dp,
                         bottom = if (isTaskScreen) 8.dp else 16.dp
                     ),
-                isError = chipOrTaskUiState.name.isBlank(),
+                isError = genericTaskOrChipUiState.name.isBlank(),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Next
                 ),
             )
-            if (isTaskScreen && chips != null && onChipSelected != null && onCreateChip != null) {
+            if (!isTaskScreen) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text("only for categorization")
+
+                    Switch(
+                        checked = genericTaskOrChipUiState.forGroupingOnly,
+                        onCheckedChange = onForGroupingOnlyToggled
+                    )
+                }
+            }
+
+            if (isTaskScreen && chips != null && onChipSelected != null) {
                 Row(
                     modifier = Modifier
                         .horizontalScroll(rememberScrollState())
                         .padding(start = 24.dp, bottom = 16.dp)
                 ) {
                     chips.forEach {
+                        // don't show deleted items
+                        if (it.deleted) return@forEach
+
                         InputChip(
-                            selected = it.id == chipOrTaskUiState.chipId,
+                            selected = it.id == genericTaskOrChipUiState.chipId,
                             onClick = { onChipSelected(it.id) },
                             label = { Text(it.name) },
                             modifier = Modifier.padding(end = 8.dp)
@@ -126,23 +144,25 @@ fun ChipOrTaskEntryBody(
                     }
                 }
             }
-
+            // if its for grouping only then all these are irrelevant
             PrioritySegmentButton(
-                selectedPriority = chipOrTaskUiState.priority,
+                selectedPriority = genericTaskOrChipUiState.priority,
                 changePriority = onSegmentedButtonPriorityClick,
+                disabled = genericTaskOrChipUiState.forGroupingOnly,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
             )
 
             TimelessSwitch(
-                checked = chipOrTaskUiState.timeless,
+                checked = genericTaskOrChipUiState.timeless,
                 onSwitchToggle = onTimelessSwitchClick,
+                disabled = genericTaskOrChipUiState.forGroupingOnly,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
 
-            if (chipOrTaskUiState.timeless) {
+            if (genericTaskOrChipUiState.timeless) {
                 TextField(
                     value = uiState.offsetHoursString,
                     onValueChange = onOffsetTimeChange,
@@ -150,74 +170,125 @@ fun ChipOrTaskEntryBody(
                     label = { Text(stringResource(R.string.offset_hours)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
-                        imeAction = if (chipOrTaskUiState.isEntryValid) ImeAction.Done else ImeAction.Previous
+                        imeAction = if (genericTaskOrChipUiState.isEntryValid) ImeAction.Done else ImeAction.Previous
                     ),
+                    enabled = !genericTaskOrChipUiState.forGroupingOnly,
                     modifier = Modifier.padding(start = 32.dp, end = 32.dp)
                 )
             }
 
-            if (!chipOrTaskUiState.timeless) {
-                OutlinedTextField(
-                    value = uiState.fastTimeIoInput,
-                    onValueChange = onFastIoInputChange,
-                    label = { Text(stringResource(R.string.fast_time_io)) },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = if (chipOrTaskUiState.isEntryValid) ImeAction.Done else ImeAction.Previous
-                    ),
-                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 8.dp),
-                )
-
-                TimeStampText(
-                    time = chipOrTaskUiState.selectedTime.time,
-                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
-                )
-
-                SetAndResetTimeButtons(
+            if (!genericTaskOrChipUiState.timeless) {
+                SetTimeAndDayOfWeek(
+                    isEntryValid = genericTaskOrChipUiState.isEntryValid,
+                    fastTimeIoValue = uiState.fastTimeIoInput,
+                    onFastIoInputChange = onFastIoInputChange,
+                    timeForTimeStampText = genericTaskOrChipUiState.selectedTime.time,
                     toggleShowTimePicker = toggleShowTimePicker,
-                    onResetTimeButtonClicked = resetSelectedTimeToCurrentTime,
-                    modifier = Modifier.padding(start = 32.dp, end = 32.dp)
-                )
-
-                TimeInputDialogBox(
+                    resetSelectedTimeToCurrentTime = resetSelectedTimeToCurrentTime,
                     showTimePicker = uiState.showTimePicker,
                     timePickerState = timePickerState,
-                    toggleShowTimePicker = toggleShowTimePicker,
-                    setTime = setTime
-                )
-
-                DaysOfTheWeekIconButtons(
-                    selectedWeekDaysBitmask = chipOrTaskUiState.selectedWeekDaysBitmask,
-                    setOrResetBitFlagForWeekday = setOrResetBitFlagForWeekday,
-                    modifier = Modifier.fillMaxWidth()
+                    setTime = setTime,
+                    selectedWeekDaysBitmask = genericTaskOrChipUiState.selectedWeekDaysBitmask,
+                    setOrResetBitFlagForWeekday = setOrResetBitFlagForWeekday
                 )
             }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            saveData()
-                            onExitRequested()
-                        }
-                    },
-                    enabled = chipOrTaskUiState.isEntryValid,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                ) {
-                    Text(stringResource(R.string.save))
-                }
-                OutlinedButton(onClick = onExitRequested, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
+            SaveAndCancelButtons(
+                coroutineScope = coroutineScope,
+                isEntryValid = genericTaskOrChipUiState.isEntryValid,
+                saveFunction = saveData,
+                exitFunction = onExitRequested,
+            )
         }
     }
 
+}
+
+@Composable
+fun SaveAndCancelButtons(
+    coroutineScope: CoroutineScope,
+    isEntryValid: Boolean,
+    saveFunction: suspend () -> Unit,
+    exitFunction: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    saveFunction()
+                    exitFunction()
+                }
+            },
+            enabled = isEntryValid,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(stringResource(R.string.save))
+        }
+        OutlinedButton(onClick = exitFunction, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.cancel))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SetTimeAndDayOfWeek(
+    isEntryValid: Boolean,
+    fastTimeIoValue: String,
+    onFastIoInputChange: (String) -> Unit,
+    timeForTimeStampText: Date,
+    toggleShowTimePicker: () -> Unit,
+    resetSelectedTimeToCurrentTime: () -> Unit,
+    showTimePicker: Boolean,
+    timePickerState: TimePickerState,
+    setTime: (TimePickerState) -> Unit,
+    selectedWeekDaysBitmask: Int,
+    setOrResetBitFlagForWeekday: (Boolean, Week) -> Unit,
+    disabled: Boolean = false,
+) {
+    OutlinedTextField(
+        value = fastTimeIoValue,
+        onValueChange = onFastIoInputChange,
+        label = { Text(stringResource(R.string.fast_time_io)) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = if (isEntryValid) ImeAction.Done else ImeAction.Previous
+        ),
+        enabled = !disabled,
+        modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 8.dp),
+    )
+
+    TimeStampText(
+        time = timeForTimeStampText,
+        modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
+    )
+
+    SetAndResetTimeButtons(
+        toggleShowTimePicker = toggleShowTimePicker,
+        onResetTimeButtonClicked = resetSelectedTimeToCurrentTime,
+        disabled = disabled,
+        modifier = Modifier.padding(start = 32.dp, end = 32.dp)
+    )
+
+    TimeInputDialogBox(
+        showTimePicker = showTimePicker,
+        timePickerState = timePickerState,
+        toggleShowTimePicker = toggleShowTimePicker,
+        setTime = setTime
+    )
+
+    DaysOfTheWeekIconButtons(
+        selectedWeekDaysBitmask = selectedWeekDaysBitmask,
+        setOrResetBitFlagForWeekday = setOrResetBitFlagForWeekday,
+        disabled = disabled,
+        modifier = Modifier.fillMaxWidth()
+    )
 }

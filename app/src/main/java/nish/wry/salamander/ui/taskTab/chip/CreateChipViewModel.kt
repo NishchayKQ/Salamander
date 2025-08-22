@@ -47,7 +47,7 @@ class CreateChipViewModel(
     private val _chipUiState = MutableSaveStateFlow(
         savedStateHandle = savedStateHandle,
         key = CHIP_UI_STATE_KEY,
-        defaultValue = ChipOrTaskUiState()
+        defaultValue = GenericTaskOrChipUiState()
     )
 
 
@@ -147,14 +147,21 @@ class CreateChipViewModel(
         }
     }
 
-    suspend fun saveCreatedChip(uiState: ChipOrTaskUiState = chipUiState.value) {
+    fun toggleForGroupingOnly(value: Boolean) {
+        _chipUiState.update { cur ->
+            cur.copy(forGroupingOnly = value)
+        }
+        verifyState()
+    }
+
+    suspend fun saveCreatedChip(uiState: GenericTaskOrChipUiState = chipUiState.value) {
         if (uiState.name.isNotBlank()) {
             if (chipId != null) {
                 repository.updateChip(chipUiState.value.toChip())
             } else {
                 repository.createChip(chipUiState.value.toChip())
             }
-            _chipUiState.update { ChipOrTaskUiState() }
+            _chipUiState.update { GenericTaskOrChipUiState() }
             _uiState.update { UiState() }
         }
     }
@@ -175,9 +182,10 @@ class CreateChipViewModel(
 
 // for verifying valid state just check if name is not blank
 @Parcelize
-data class ChipOrTaskUiState(
+data class GenericTaskOrChipUiState(
     val chipId: Int? = null,
     val name: String = "",
+    val forGroupingOnly: Boolean = false,
     val selectedTime: Calendar = Calendar.getInstance(),
     val selectedWeekDaysBitmask: Int = 0,
     val priority: Priority = Priority.Normal,
@@ -193,10 +201,11 @@ data class UiState(
     val offsetHoursString: String = "1",
 ) : Parcelable
 
-fun ChipOrTaskUiState.toChip(): Chip {
+fun GenericTaskOrChipUiState.toChip(): Chip {
     return Chip(
         id = chipId ?: 0,
         name = name,
+        forGroupingOnly = forGroupingOnly,
         repeatOnDaysBitFlag = if (!timeless) selectedWeekDaysBitmask else 0,
         dateTime = if (!timeless) selectedTime else null,
         floatingOffsetHours = if (timeless) offsetHours else null,
@@ -204,14 +213,15 @@ fun ChipOrTaskUiState.toChip(): Chip {
     )
 }
 
-fun Chip.toChipUiState(): ChipOrTaskUiState =
-    ChipOrTaskUiState(
+fun Chip.toChipUiState(): GenericTaskOrChipUiState =
+    GenericTaskOrChipUiState(
         chipId = id,
         name = name,
+        forGroupingOnly = forGroupingOnly,
         selectedTime = dateTime ?: Calendar.getInstance(),
         selectedWeekDaysBitmask = repeatOnDaysBitFlag,
         priority = priority,
-        timeless = dateTime == null,
+        timeless = floatingOffsetHours != null,
         offsetHours = floatingOffsetHours ?: 1,
         isEntryValid = false
     )

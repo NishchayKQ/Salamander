@@ -24,7 +24,7 @@ fun CreateChip(
     val uiState by viewModel.uiState.collectAsState()
 
     ChipOrTaskEntryBody(
-        chipOrTaskUiState = chipUiState,
+        genericTaskOrChipUiState = chipUiState,
         uiState = uiState,
         onNameChange = viewModel::onChipNameChange,
         onSegmentedButtonPriorityClick = viewModel::onSegmentedButtonPriorityClick,
@@ -37,6 +37,7 @@ fun CreateChip(
         setOrResetBitFlagForWeekday = viewModel::setOrResetBitFlagForWeekday,
         saveData = viewModel::saveCreatedChip,
         onExitRequested = exitChip,
+        onForGroupingOnlyToggled = viewModel::toggleForGroupingOnly,
         modifier = modifier
     )
 
