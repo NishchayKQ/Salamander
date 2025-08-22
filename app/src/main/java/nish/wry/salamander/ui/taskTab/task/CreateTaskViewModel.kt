@@ -33,7 +33,7 @@ class CreateTaskViewModel(
     @OptIn(ExperimentalSerializationApi::class)
     private val taskId: Int? = try {
         savedStateHandle.toRoute<EditTaskDestination>().taskId
-    } catch (e: MissingFieldException) {
+    } catch (_: MissingFieldException) {
         null
     }
 

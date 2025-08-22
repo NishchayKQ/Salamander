@@ -30,7 +30,7 @@ class CreateChipViewModel(
     @OptIn(ExperimentalSerializationApi::class)
     private val chipId: Int? = try {
         savedStateHandle.toRoute<EditChipDestination>().chipId
-    } catch (e: MissingFieldException) {
+    } catch (_: MissingFieldException) {
         null
     }
 
