@@ -4,7 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,12 +35,12 @@ fun DaysOfTheWeekIconButtons(
                 colors = IconButtonDefaults.outlinedIconToggleButtonColors(
                     containerColor = Color.Transparent,
                     checkedContainerColor = Color.Transparent,
-                    checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+//                    checkedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
                 ),
                 border =
                     if (toggledOn) BorderStroke(
                         1.dp,
-                        MaterialTheme.colorScheme.onTertiaryContainer
+                        LocalContentColor.current
                     ) else null
             ) {
                 Text(

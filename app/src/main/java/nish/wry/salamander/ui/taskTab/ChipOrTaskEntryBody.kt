@@ -21,7 +21,6 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePickerState
@@ -29,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -42,10 +42,10 @@ import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
 import nish.wry.salamander.ui.common.PrioritySegmentButton
+import nish.wry.salamander.ui.common.SalamanderSwitch
 import nish.wry.salamander.ui.common.SetAndResetTimeButtons
 import nish.wry.salamander.ui.common.TimeInputDialogBox
 import nish.wry.salamander.ui.common.TimeStampText
-import nish.wry.salamander.ui.common.TimelessSwitch
 import nish.wry.salamander.ui.taskTab.chip.GenericTaskOrChipUiState
 import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
@@ -71,7 +71,7 @@ fun ChipOrTaskEntryBody(
     chips: List<Chip>? = null,
     onCreateChip: (() -> Unit)? = null,
     onChipSelected: ((Int) -> Unit)? = null,
-    onForGroupingOnlyToggled: ((Boolean) -> Unit)? = null,
+    onForGroupingOnlyToggled: (() -> Unit)? = null,
 ) {
     val isTaskScreen = onCreateChip != null
 
@@ -109,14 +109,11 @@ fun ChipOrTaskEntryBody(
                 ),
             )
             if (!isTaskScreen) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text("only for categorization")
-
-                    Switch(
-                        checked = genericTaskOrChipUiState.forGroupingOnly,
-                        onCheckedChange = onForGroupingOnlyToggled
-                    )
-                }
+                SalamanderSwitch(
+                    checked = genericTaskOrChipUiState.forGroupingOnly,
+                    onCheckedChange = onForGroupingOnlyToggled,
+                    switchText = stringResource(R.string.only_for_categorization)
+                )
             }
 
             if (isTaskScreen && chips != null && onChipSelected != null) {
@@ -152,13 +149,15 @@ fun ChipOrTaskEntryBody(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .alpha(if (genericTaskOrChipUiState.forGroupingOnly) 0.38f else 1f)
             )
 
-            TimelessSwitch(
+            SalamanderSwitch(
                 checked = genericTaskOrChipUiState.timeless,
-                onSwitchToggle = onTimelessSwitchClick,
+                onCheckedChange = onTimelessSwitchClick,
                 disabled = genericTaskOrChipUiState.forGroupingOnly,
-                modifier = Modifier.padding(bottom = 32.dp)
+                switchText = stringResource(R.string.timeless_switch_name),
+                toolTip = stringResource(R.string.timeless_switch_help)
             )
 
 
@@ -189,7 +188,8 @@ fun ChipOrTaskEntryBody(
                     timePickerState = timePickerState,
                     setTime = setTime,
                     selectedWeekDaysBitmask = genericTaskOrChipUiState.selectedWeekDaysBitmask,
-                    setOrResetBitFlagForWeekday = setOrResetBitFlagForWeekday
+                    setOrResetBitFlagForWeekday = setOrResetBitFlagForWeekday,
+                    disabled = genericTaskOrChipUiState.forGroupingOnly
                 )
             }
 
@@ -241,7 +241,7 @@ fun SaveAndCancelButtons(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetTimeAndDayOfWeek(
+private fun SetTimeAndDayOfWeek(
     isEntryValid: Boolean,
     fastTimeIoValue: String,
     onFastIoInputChange: (String) -> Unit,
@@ -268,7 +268,9 @@ fun SetTimeAndDayOfWeek(
 
     TimeStampText(
         time = timeForTimeStampText,
-        modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
+        modifier = Modifier
+            .padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
+            .alpha(alpha = if (disabled) 0.38f else 1f)
     )
 
     SetAndResetTimeButtons(

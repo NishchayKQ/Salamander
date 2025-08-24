@@ -18,4 +18,7 @@
     <string name="offset_hours">Offset hours</string>
     <string name="save">Save</string>
     <string name="task_name">Task name</string>
+    <string name="only_for_categorization">only for categorization</string>
+    <string name="timeless_switch_help">Show event on timeline with offset hours instead of a fixed time</string>
+    <string name="timeless_switch_name">Timeless</string>
 </resources>

@@ -17,14 +17,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
+import nish.wry.salamander.R
 
+// TODO someday we will standardise padding, like don't hardcode these vals, instead for
+//  start/end padding == column
+// ✅ [done for this function in particular] top/bottom == particular composable decides how much space i need (top and bottom)
 @Composable
-fun TimelessSwitch(
+fun SalamanderSwitch(
     checked: Boolean,
-    onSwitchToggle: () -> Unit,
+    onCheckedChange: (() -> Unit)?,
+    switchText: String,
     modifier: Modifier = Modifier,
-    disabled: Boolean = false
+    disabled: Boolean = false,
+    toolTip: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Row(
@@ -32,19 +40,29 @@ fun TimelessSwitch(
             .fillMaxWidth()
             .clickable(
                 interactionSource = interactionSource,
-                indication = null,
-                onClick = onSwitchToggle,
+//                indication = null,
+                onClick = if (onCheckedChange != null) onCheckedChange else {
+                    {}
+                },
                 enabled = !disabled
             )
-            .padding(start = 32.dp, end = 32.dp)
+            .padding(
+                start = 32.dp,
+                end = 32.dp,
+                top = dimensionResource(R.dimen.top_medium_padding),
+                bottom = dimensionResource(R.dimen.bottom_medium_padding)
+            )
+            .alpha(if (disabled) 0.38f else 1f)
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("Timeless")
-            Text(
-                text = "Show event on timeline with offset hours instead of a fixed time",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(switchText)
+            if (toolTip != null) {
+                Text(
+                    text = toolTip,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
 
         Switch(

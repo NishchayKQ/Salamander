@@ -147,9 +147,9 @@ class CreateChipViewModel(
         }
     }
 
-    fun toggleForGroupingOnly(value: Boolean) {
+    fun toggleForGroupingOnly() {
         _chipUiState.update { cur ->
-            cur.copy(forGroupingOnly = value)
+            cur.copy(forGroupingOnly = !cur.forGroupingOnly)
         }
         verifyState()
     }
