@@ -24,10 +24,9 @@ android {
     defaultConfig {
         applicationId = "nish.wry.salamander"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -107,6 +106,10 @@ dependencies {
     // from https://stackoverflow.com/questions/56695997/how-to-fix-call-requires-api-level-26-current-min-is-25-error-in-android
     // For AGP 7.4+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // if publishing to google playStore then this has option to download below library at install time of app
+    // https://developers.google.com/ml-kit/vision/barcode-scanning/code-scanner#configure_your_app
+    implementation(libs.play.services.code.scanner)
 
 //    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 //

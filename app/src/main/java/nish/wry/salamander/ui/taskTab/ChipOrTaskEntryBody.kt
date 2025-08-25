@@ -1,23 +1,16 @@
 package nish.wry.salamander.ui.taskTab
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -42,6 +35,7 @@ import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
 import nish.wry.salamander.ui.common.PrioritySegmentButton
+import nish.wry.salamander.ui.common.SalamanderSingleInputChip
 import nish.wry.salamander.ui.common.SalamanderSwitch
 import nish.wry.salamander.ui.common.SetAndResetTimeButtons
 import nish.wry.salamander.ui.common.TimeInputDialogBox
@@ -117,29 +111,19 @@ fun ChipOrTaskEntryBody(
             }
 
             if (isTaskScreen && chips != null && onChipSelected != null) {
-                Row(
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .padding(start = 24.dp, bottom = 16.dp)
-                ) {
-                    chips.forEach {
-                        // don't show deleted items
-                        if (it.deleted) return@forEach
-
-                        InputChip(
-                            selected = it.id == genericTaskOrChipUiState.chipId,
-                            onClick = { onChipSelected(it.id) },
-                            label = { Text(it.name) },
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-                    IconButton(onClick = onCreateChip) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = stringResource(R.string.add_event_chip)
-                        )
-                    }
-                }
+                SalamanderSingleInputChip(
+                    chips = chips,
+                    selectedChipId = genericTaskOrChipUiState.chipId ?: -1,
+                    getChipId = Chip::id,
+                    getChipName = Chip::name,
+                    getChipDeleted = Chip::deleted,
+                    modifier = Modifier.padding(
+                        start = 24.dp,
+                        bottom = 16.dp
+                    ),
+                    onChipSelected = onChipSelected,
+                    onCreateChipClicked = onCreateChip
+                )
             }
             // if its for grouping only then all these are irrelevant
             PrioritySegmentButton(
