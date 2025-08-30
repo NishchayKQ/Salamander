@@ -23,7 +23,7 @@ import nish.wry.salamander.data.room.task.TaskDao
 @TypeConverters(Converters::class)
 @Database(
     entities = [Chip::class, Task::class, ActivityInterval::class, Category::class, DailyLog::class, PaymentChip::class, PaymentRecord::class],
-    version = 9
+    version = 11
 )
 abstract class SalamanderRoomDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao

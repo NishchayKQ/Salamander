@@ -21,4 +21,6 @@
     <string name="only_for_categorization">only for categorization</string>
     <string name="timeless_switch_help">Show event on timeline with offset hours instead of a fixed time</string>
     <string name="timeless_switch_name">Timeless</string>
+    <string name="accessibility_service_label">Salamander</string>
+    <string name="accessibility_service_description">it will only launch our service on select few payment apps to track payments</string>
 </resources>

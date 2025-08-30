@@ -5,6 +5,8 @@ import nish.wry.salamander.data.room.life.PaymentChip
 import nish.wry.salamander.data.room.life.PaymentChipDao
 import nish.wry.salamander.data.room.life.PaymentRecord
 import nish.wry.salamander.data.room.life.PaymentRecordDao
+import nish.wry.salamander.data.room.life.PendingTransactionRecord
+import kotlin.time.Clock
 
 interface PaymentRepository {
     suspend fun addPaymentChip(paymentChip: PaymentChip)
@@ -20,11 +22,17 @@ interface PaymentRepository {
     fun getAllPaymentChips(): Flow<List<PaymentChip>>
 
     fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip>
+
+    suspend fun addPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
+
+    suspend fun confirmPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
 }
 
 class OfflinePaymentRepository(
     private val paymentChipDao: PaymentChipDao,
     private val paymentRecordDao: PaymentRecordDao,
+    // we pass this so that in unit testing we can pass custom clocks
+    private val clock: Clock = Clock.System,
 ) : PaymentRepository {
     override suspend fun addPaymentChip(paymentChip: PaymentChip) =
         paymentChipDao.insert(paymentChip = paymentChip)
@@ -45,5 +53,22 @@ class OfflinePaymentRepository(
 
     override fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip> =
         paymentChipDao.getPaymentChip(paymentChipId = paymentChipId)
+
+    override suspend fun addPendingTransaction(pendingTransactionRecord: PendingTransactionRecord) =
+        paymentRecordDao.addPendingTransaction(
+            upiApp = pendingTransactionRecord.upiApp,
+            amount = pendingTransactionRecord.amount,
+            merchantName = pendingTransactionRecord.merchantName,
+            instant = clock.now()
+        )
+
+
+    override suspend fun confirmPendingTransaction(pendingTransactionRecord: PendingTransactionRecord) =
+        paymentRecordDao.confirmPendingTransaction(
+            upiApp = pendingTransactionRecord.upiApp,
+            amount = pendingTransactionRecord.amount,
+            merchantName = pendingTransactionRecord.merchantName,
+            instant = clock.now()
+        )
 
 }

@@ -5,13 +5,15 @@ import nish.wry.salamander.data.Priority
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Calendar
+import kotlin.time.Instant
+
 
 class Converters {
     @TypeConverter
     fun epochTimeToCalender(value: Long?): Calendar? {
         return if (value != null) {
             val cal = Calendar.getInstance()
-            cal.setTimeInMillis(value)
+            cal.timeInMillis = value
             cal
         } else {
             null
@@ -44,12 +46,22 @@ class Converters {
     }
 
     @TypeConverter
-    fun localTimeToInt(localTime: LocalTime): Int{
+    fun localTimeToInt(localTime: LocalTime): Int {
         return localTime.toSecondOfDay()
     }
 
     @TypeConverter
-    fun intToLocalTime(int: Int):LocalTime{
+    fun intToLocalTime(int: Int): LocalTime {
         return LocalTime.ofSecondOfDay(int.toLong())
+    }
+
+    @TypeConverter
+    fun instantToLong(instant: Instant): Long {
+        return instant.epochSeconds
+    }
+
+    @TypeConverter
+    fun longToInstant(long: Long): Instant {
+        return Instant.fromEpochSeconds(long)
     }
 }

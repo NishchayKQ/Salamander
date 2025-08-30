@@ -51,6 +51,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    // https://stackoverflow.com/a/79682146/23121081
+    // https://kotlinlang.org/docs/opt-in-requirements.html#opt-in-a-module
+    // removing this results in dao implementation not having opt in and thus build failing
+    // issue tracker - https://issuetracker.google.com/issues/410607888
+    kotlin.compilerOptions.optIn.add("kotlin.time.ExperimentalTime")
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -109,7 +116,12 @@ dependencies {
 
     // if publishing to google playStore then this has option to download below library at install time of app
     // https://developers.google.com/ml-kit/vision/barcode-scanning/code-scanner#configure_your_app
+    // todo deprecated
     implementation(libs.play.services.code.scanner)
+
+    // should have added this before, I NEED updated sqlite please.
+    // https://developer.android.com/jetpack/androidx/releases/sqlite#kts
+    implementation(libs.androidx.sqlite.ktx)
 
 //    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 //
