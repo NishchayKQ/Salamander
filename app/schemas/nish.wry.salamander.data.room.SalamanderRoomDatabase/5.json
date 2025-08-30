@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "3e823737f42ac5a2cf286108375a751d",
+    "identityHash": "db99894f00402598c7a0edfe5428b9ad",
     "entities": [
       {
         "tableName": "chip",
@@ -179,7 +179,26 @@
             "activity_id"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_activity_interval_day_id",
+            "unique": false,
+            "columnNames": [
+              "day_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activity_interval_day_id` ON `${TABLE_NAME}` (`day_id`)"
+          },
+          {
+            "name": "index_activity_interval_start",
+            "unique": false,
+            "columnNames": [
+              "start"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activity_interval_start` ON `${TABLE_NAME}` (`start`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "daily_log",
@@ -279,7 +298,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3e823737f42ac5a2cf286108375a751d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db99894f00402598c7a0edfe5428b9ad')"
     ]
   }
 }

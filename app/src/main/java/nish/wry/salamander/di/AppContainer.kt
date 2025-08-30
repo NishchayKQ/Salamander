@@ -8,6 +8,7 @@ import nish.wry.salamander.data.room.SalamanderRoomDatabase
 interface AppContainer {
     val taskRepository: TaskRepository
     val activityRepository: ActivityRepository
+    val paymentRepository: PaymentRepository
     val dateTimeTracker: DateTimeTracker
 }
 
@@ -28,6 +29,12 @@ class AppDataContainer(
             activityIntervalDao = database.activityIntervalDao(),
             categoryDao = database.categoryDao(),
             dailyLogDao = database.dailyLogDao(),
+        )
+    }
+    override val paymentRepository: PaymentRepository by lazy {
+        OfflinePaymentRepository(
+            paymentChipDao = database.paymentChipDao(),
+            paymentRecordDao = database.paymentRecordDao(),
         )
     }
 

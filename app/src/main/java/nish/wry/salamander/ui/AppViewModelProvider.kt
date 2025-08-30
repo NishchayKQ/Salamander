@@ -9,6 +9,8 @@ import nish.wry.salamander.data.TaskDataSource
 import nish.wry.salamander.data.TaskToTaskDrawingData
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.SalamanderApplication
+import nish.wry.salamander.ui.life.PaymentChipViewModel
+import nish.wry.salamander.ui.life.PaymentScreenViewModel
 import nish.wry.salamander.ui.suBase.SubBaseViewModel
 import nish.wry.salamander.ui.suBase.category.CategoryViewModel
 import nish.wry.salamander.ui.taskTab.chip.CreateChipViewModel
@@ -40,20 +42,35 @@ object AppViewModelProvider {
                 dateTimeTracker = salamanderApplication().container.dateTimeTracker,
                 repository = salamanderApplication().container.taskRepository,
                 taskDataSource = TaskDataSource.getInstance(taskToTaskDrawingData),
-                getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository)
+                getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository::getAllChips)
             )
         }
         initializer {
             CreateTaskViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
                 repository = salamanderApplication().container.taskRepository,
-                getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository)
+                getAllChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.taskRepository::getAllChips)
             )
         }
         initializer {
             CreateChipViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
                 repository = salamanderApplication().container.taskRepository
+            )
+        }
+
+        initializer {
+            PaymentScreenViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                getAllPaymentChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.paymentRepository::getAllPaymentChips),
+                paymentRepository = salamanderApplication().container.paymentRepository
+            )
+        }
+
+        initializer {
+            PaymentChipViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
+                repository = salamanderApplication().container.paymentRepository
             )
         }
     }

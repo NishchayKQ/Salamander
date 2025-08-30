@@ -5,6 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import nish.wry.salamander.data.room.life.PaymentChip
+import nish.wry.salamander.data.room.life.PaymentChipDao
+import nish.wry.salamander.data.room.life.PaymentRecord
+import nish.wry.salamander.data.room.life.PaymentRecordDao
 import nish.wry.salamander.data.room.suBase.ActivityInterval
 import nish.wry.salamander.data.room.suBase.ActivityIntervalDao
 import nish.wry.salamander.data.room.suBase.Category
@@ -18,8 +22,8 @@ import nish.wry.salamander.data.room.task.TaskDao
 
 @TypeConverters(Converters::class)
 @Database(
-    entities = [Chip::class, Task::class, ActivityInterval::class, Category::class, DailyLog::class],
-    version = 5
+    entities = [Chip::class, Task::class, ActivityInterval::class, Category::class, DailyLog::class, PaymentChip::class, PaymentRecord::class],
+    version = 9
 )
 abstract class SalamanderRoomDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
@@ -32,6 +36,10 @@ abstract class SalamanderRoomDatabase : RoomDatabase() {
 
     abstract fun dailyLogDao(): DailyLogDao
 
+    abstract fun paymentChipDao() : PaymentChipDao
+
+    abstract fun paymentRecordDao(): PaymentRecordDao
+
     companion object {
 
         @Volatile
@@ -43,7 +51,10 @@ abstract class SalamanderRoomDatabase : RoomDatabase() {
                     context = context,
                     klass = SalamanderRoomDatabase::class.java,
                     name = "salamander_database"
-                ).fallbackToDestructiveMigration().build().also { Instance = it }
+                )
+                    .fallbackToDestructiveMigration(true)
+//                    .createFromAsset()
+                    .build().also { Instance = it }
             }
         }
     }

@@ -27,10 +27,14 @@ import androidx.navigation.compose.rememberNavController
 import nish.wry.salamander.data.Constants
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import nish.wry.salamander.ui.navigation.EditTaskDestination
-import nish.wry.salamander.ui.screens.MainNishchayDestination
+import nish.wry.salamander.ui.life.MainNishchayDestination
 import nish.wry.salamander.ui.suBase.MainSuBaseDestination
-import nish.wry.salamander.ui.screens.NishchayScreen
-import nish.wry.salamander.ui.screens.NishchayScreenDestination
+import nish.wry.salamander.ui.life.NishchayScreen
+import nish.wry.salamander.ui.life.NishchayScreenDestination
+import nish.wry.salamander.ui.life.PaymentChipScreen
+import nish.wry.salamander.ui.life.PaymentChipScreenDestination
+import nish.wry.salamander.ui.life.PaymentScreen
+import nish.wry.salamander.ui.life.PaymentScreenDestination
 import nish.wry.salamander.ui.suBase.SuBase
 import nish.wry.salamander.ui.suBase.SuBaseScreenDestination
 import nish.wry.salamander.ui.suBase.category.CreateCategoryDestination
@@ -120,21 +124,27 @@ private fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     NavHost(
-        navController = navController, startDestination = MainSuBaseDestination, modifier = modifier
+        navController = navController, startDestination = MainNishchayDestination, modifier = modifier
 
     ) {
         composable<MainSuBaseDestination> {
             val suBaseNavController = rememberNavController()
 
-            NavHost(navController = suBaseNavController, startDestination = SuBaseScreenDestination){
+            NavHost(
+                navController = suBaseNavController, startDestination = SuBaseScreenDestination
+            ) {
                 composable<SuBaseScreenDestination> {
-                    SuBase(onAddCategoryClicked = {suBaseNavController.navigate(CreateCategoryDestination)})
+                    SuBase(onAddCategoryClicked = {
+                        suBaseNavController.navigate(
+                            CreateCategoryDestination
+                        )
+                    })
                 }
 
                 composable<CreateCategoryDestination> {
 
                     // TODO shift others to navigate up or whatever appropriate
-                    CategoryScreen(exitScreen = {suBaseNavController.navigateUp()})
+                    CategoryScreen(exitScreen = { suBaseNavController.navigateUp() })
                 }
 
 
@@ -167,8 +177,7 @@ private fun AppNavHost(
 
 
                 NavHost(
-                    navController = taskNavController,
-                    startDestination = TaskTimelineDestination
+                    navController = taskNavController, startDestination = TaskTimelineDestination
                 ) {
 
 
@@ -244,7 +253,19 @@ private fun AppNavHost(
                 navController = nishchayNavController, startDestination = NishchayScreenDestination
             ) {
                 composable<NishchayScreenDestination> {
-                    NishchayScreen()
+                    NishchayScreen(
+                        onScanQrClicked = { nishchayNavController.navigate(PaymentScreenDestination) })
+                }
+
+                composable<PaymentScreenDestination> {
+                    PaymentScreen(onCreatePaymentChipClicked = {
+                        nishchayNavController.navigate(PaymentChipScreenDestination)
+                    }, onExitRequested = { nishchayNavController.navigateUp() })
+                }
+
+                composable<PaymentChipScreenDestination> {
+                    PaymentChipScreen(
+                        onExitRequested = { nishchayNavController.navigateUp() })
                 }
             }
         }
