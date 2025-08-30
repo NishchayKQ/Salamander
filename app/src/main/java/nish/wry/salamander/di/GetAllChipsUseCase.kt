@@ -1,17 +1,17 @@
 package nish.wry.salamander.di
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import nish.wry.salamander.data.room.task.Chip
 
 
-class GetAllChipsUseCase(
-    private val repository: TaskRepository,
+class GetAllChipsUseCase<GenericChip>(
+    private val getAllChips: () -> Flow<List<GenericChip>>,
 ) {
-    operator fun invoke(viewModelScope: CoroutineScope): StateFlow<List<Chip>> {
-        return repository.getAllChips()
+    operator fun invoke(viewModelScope: CoroutineScope): StateFlow<List<GenericChip>> {
+        return getAllChips()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

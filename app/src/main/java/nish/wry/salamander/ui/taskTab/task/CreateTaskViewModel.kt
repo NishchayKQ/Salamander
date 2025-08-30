@@ -27,7 +27,7 @@ import java.util.Calendar
 class CreateTaskViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
-    getAllChipsUseCase: GetAllChipsUseCase,
+    getAllChipsUseCase: GetAllChipsUseCase<Chip>,
 ) : ViewModel() {
 
     @OptIn(ExperimentalSerializationApi::class)

@@ -1,7 +1,6 @@
 package nish.wry.salamander.ui.taskTab
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,9 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,7 +16,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -27,14 +23,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import nish.wry.salamander.R
 import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.ui.common.DaysOfTheWeekIconButtons
 import nish.wry.salamander.ui.common.PrioritySegmentButton
+import nish.wry.salamander.ui.common.SalamanderSaveAndCancelButtons
 import nish.wry.salamander.ui.common.SalamanderSingleInputChip
 import nish.wry.salamander.ui.common.SalamanderSwitch
 import nish.wry.salamander.ui.common.SetAndResetTimeButtons
@@ -177,7 +172,7 @@ fun ChipOrTaskEntryBody(
                 )
             }
 
-            SaveAndCancelButtons(
+            SalamanderSaveAndCancelButtons(
                 coroutineScope = coroutineScope,
                 isEntryValid = genericTaskOrChipUiState.isEntryValid,
                 saveFunction = saveData,
@@ -186,41 +181,6 @@ fun ChipOrTaskEntryBody(
         }
     }
 
-}
-
-@Composable
-fun SaveAndCancelButtons(
-    coroutineScope: CoroutineScope,
-    isEntryValid: Boolean,
-    saveFunction: suspend () -> Unit,
-    exitFunction: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    saveFunction()
-                    exitFunction()
-                }
-            },
-            enabled = isEntryValid,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        ) {
-            Text(stringResource(R.string.save))
-        }
-        OutlinedButton(onClick = exitFunction, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.cancel))
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

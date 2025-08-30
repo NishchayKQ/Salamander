@@ -60,7 +60,8 @@ fun TaskTopAppBar(
     ) {
         SearchBar(
             inputField = {
-                SearchBarDefaults.InputField(query = searchQuery,
+                SearchBarDefaults.InputField(
+                    query = searchQuery,
                     onQueryChange = onQueryChange,
                     onSearch = onSearch,
                     expanded = expanded,
@@ -76,6 +77,8 @@ fun TaskTopAppBar(
                 .horizontalScroll(rememberScrollState())
         ) {
             chips.forEach {
+                // don't show deleted chips
+                if (it.deleted) return@forEach
                 val chipInteractionSource = remember { MutableInteractionSource() }
                 var menuExpanded by remember { mutableStateOf(false) }
 

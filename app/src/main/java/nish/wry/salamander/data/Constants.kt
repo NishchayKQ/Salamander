@@ -1,7 +1,7 @@
 package nish.wry.salamander.data
 
 import nish.wry.salamander.ui.navigation.MainDestination
-import nish.wry.salamander.ui.screens.MainNishchayDestination
+import nish.wry.salamander.ui.life.MainNishchayDestination
 import nish.wry.salamander.ui.suBase.MainSuBaseDestination
 import nish.wry.salamander.ui.taskTab.main.MainTaskDestination
 
