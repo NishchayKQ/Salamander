@@ -1,5 +1,6 @@
 package nish.wry.salamander.data.room.life
 
+import androidx.paging.PagingSource
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Insert
@@ -24,6 +25,12 @@ interface PaymentRecordDao {
 // this limit messes up  "limit 1"
     )
     suspend fun delete(paymentRecordId: Int)
+
+    /**returns all payments other than ones with pending flag raised**/
+    @Query("SELECT * FROM payment_record " +
+            "WHERE transaction_pending = 0 " +
+            "ORDER BY time_of_transaction desc")
+    fun fetchAllSuccessfulPayments() : PagingSource<Int, PaymentRecord>
 
     /** confirms a pending transaction if any**/
     @Query(

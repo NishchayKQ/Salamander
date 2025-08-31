@@ -33,8 +33,8 @@ import nish.wry.salamander.ui.life.NishchayScreen
 import nish.wry.salamander.ui.life.NishchayScreenDestination
 import nish.wry.salamander.ui.life.PaymentChipScreen
 import nish.wry.salamander.ui.life.PaymentChipScreenDestination
-import nish.wry.salamander.ui.life.PaymentScreen
-import nish.wry.salamander.ui.life.PaymentScreenDestination
+import nish.wry.salamander.ui.life.PaymentRecordScreen
+import nish.wry.salamander.ui.life.PaymentRecordScreenDestination
 import nish.wry.salamander.ui.suBase.SuBase
 import nish.wry.salamander.ui.suBase.SuBaseScreenDestination
 import nish.wry.salamander.ui.suBase.category.CreateCategoryDestination
@@ -254,11 +254,13 @@ private fun AppNavHost(
             ) {
                 composable<NishchayScreenDestination> {
                     NishchayScreen(
-                        onScanQrClicked = { nishchayNavController.navigate(PaymentScreenDestination) })
+                        onScanQrClicked = { nishchayNavController.navigate(PaymentRecordScreenDestination) },
+                        onPaymentRecordClicked = {}
+                    )
                 }
 
-                composable<PaymentScreenDestination> {
-                    PaymentScreen(onCreatePaymentChipClicked = {
+                composable<PaymentRecordScreenDestination> {
+                    PaymentRecordScreen(onCreatePaymentChipClicked = {
                         nishchayNavController.navigate(PaymentChipScreenDestination)
                     }, onExitRequested = { nishchayNavController.navigateUp() })
                 }
