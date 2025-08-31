@@ -10,7 +10,8 @@ import nish.wry.salamander.data.TaskToTaskDrawingData
 import nish.wry.salamander.di.GetAllChipsUseCase
 import nish.wry.salamander.di.SalamanderApplication
 import nish.wry.salamander.ui.life.PaymentChipViewModel
-import nish.wry.salamander.ui.life.PaymentScreenViewModel
+import nish.wry.salamander.ui.life.PaymentHistoryViewModel
+import nish.wry.salamander.ui.life.PaymentRecordScreenViewModel
 import nish.wry.salamander.ui.suBase.SubBaseViewModel
 import nish.wry.salamander.ui.suBase.category.CategoryViewModel
 import nish.wry.salamander.ui.taskTab.chip.CreateChipViewModel
@@ -60,7 +61,7 @@ object AppViewModelProvider {
         }
 
         initializer {
-            PaymentScreenViewModel(
+            PaymentRecordScreenViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
                 getAllPaymentChipsUseCase = GetAllChipsUseCase(salamanderApplication().container.paymentRepository::getAllPaymentChips),
                 paymentRepository = salamanderApplication().container.paymentRepository
@@ -71,6 +72,12 @@ object AppViewModelProvider {
             PaymentChipViewModel(
                 savedStateHandle = this.createSavedStateHandle(),
                 repository = salamanderApplication().container.paymentRepository
+            )
+        }
+
+        initializer {
+            PaymentHistoryViewModel(
+                paymentRepository = salamanderApplication().container.paymentRepository
             )
         }
     }

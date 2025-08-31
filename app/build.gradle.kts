@@ -114,14 +114,20 @@ dependencies {
     // For AGP 7.4+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-    // if publishing to google playStore then this has option to download below library at install time of app
-    // https://developers.google.com/ml-kit/vision/barcode-scanning/code-scanner#configure_your_app
-    // todo deprecated
-    implementation(libs.play.services.code.scanner)
-
     // should have added this before, I NEED updated sqlite please.
     // https://developer.android.com/jetpack/androidx/releases/sqlite#kts
     implementation(libs.androidx.sqlite.ktx)
+
+    // enters the demon - paging 3 - https://developer.android.com/jetpack/androidx/releases/paging#kts
+    implementation (libs.androidx.paging.runtime)
+//    Jetpack Compose integration
+    implementation(libs.androidx.paging.compose)
+
+    // https://stackoverflow.com/questions/75151424/android-paging-3-codelabs-failed-on-room-paging
+    // https://maven.google.com/web/index.html?q=paging#androidx.room:room-paging
+    implementation(libs.androidx.room.paging)
+
+
 
 //    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 //

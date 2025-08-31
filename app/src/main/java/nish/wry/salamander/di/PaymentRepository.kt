@@ -1,5 +1,8 @@
 package nish.wry.salamander.di
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import nish.wry.salamander.data.room.life.PaymentChip
 import nish.wry.salamander.data.room.life.PaymentChipDao
@@ -22,6 +25,8 @@ interface PaymentRepository {
     fun getAllPaymentChips(): Flow<List<PaymentChip>>
 
     fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip>
+
+    fun getAllSuccessfulPayments(): Flow<PagingData<PaymentRecord>>
 
     suspend fun addPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
 
@@ -53,6 +58,12 @@ class OfflinePaymentRepository(
 
     override fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip> =
         paymentChipDao.getPaymentChip(paymentChipId = paymentChipId)
+
+    override fun getAllSuccessfulPayments(): Flow<PagingData<PaymentRecord>> = Pager(
+        config = PagingConfig(
+            pageSize = 20, // no of items to load
+            enablePlaceholders = false
+        ), pagingSourceFactory = { paymentRecordDao.fetchAllSuccessfulPayments() }).flow
 
     override suspend fun addPendingTransaction(pendingTransactionRecord: PendingTransactionRecord) =
         paymentRecordDao.addPendingTransaction(
