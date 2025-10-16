@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,7 +7,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
 
     // Kotlin serialization plugin for type safe routes and navigation arguments
-    kotlin("plugin.serialization") version "2.1.10"
+    // https://kotlinlang.org/docs/serialization.html#add-plugins-and-dependencies
+    kotlin("plugin.serialization") version "2.2.20"
 
     // support for Parcelable
     id("kotlin-parcelize")
@@ -58,8 +61,11 @@ android {
     // issue tracker - https://issuetracker.google.com/issues/410607888
     kotlin.compilerOptions.optIn.add("kotlin.time.ExperimentalTime")
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    // https://stackoverflow.com/questions/77363060/how-to-replace-the-deprecated-kotlinoptions-in-a-java-library-kotlin-module
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+        }
     }
     buildFeatures {
         compose = true

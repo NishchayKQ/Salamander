@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,8 +31,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import nish.wry.salamander.R
 import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import java.text.SimpleDateFormat
 import java.time.LocalTime
@@ -84,7 +84,7 @@ fun TasksBox(
                         menuExpanded = -1
                     }, leadingIcon = {
                         Icon(
-                            Icons.Outlined.Delete,
+                            painterResource(R.drawable.outline_delete_24),
                             null,
                             tint = MaterialTheme.colorScheme.error
                         )

@@ -11,7 +11,9 @@ private const val PAYTM_PACKAGE_NAME_STRING = "net.one97.paytm"
 
 enum class UPIApp() {
     GOOGLE_PAY,
-    PAYTM;
+    PAYTM,
+    /**for cases when user manually adds a transaction**/
+    NONE;
 
     companion object{
         fun packageNameToUPIAppsEnum(packageName: String) : UPIApp{

@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    id("com.google.devtools.ksp") version "2.2.10-2.0.2" apply false
+    // https://developer.android.com/build/migrate-to-ksp#add-ksp
+    id("com.google.devtools.ksp") version "2.2.20-2.0.4" apply false
     alias(libs.plugins.compose.compiler) apply false
 }

@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -15,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
@@ -76,7 +75,7 @@ fun TaskScreen(
             FloatingActionButton(
                 onClick = onCreateTaskClicked,
             ) {
-                Icon(Icons.Default.Add, null)
+                Icon(painterResource(R.drawable.outline_add_24), null)
             }
         },
         modifier = modifier.fillMaxSize()
@@ -100,6 +99,8 @@ fun TaskScreen(
                 currentTimeComposable = { CurrentTimeText(is24Hour, localTime) },
                 currentTimeDivider = { CurrentTimeDivider() },
                 saveScrollAndScale = viewModel::saveScrollState,
+                firstLoadScrollValue = timelineUiState.firstLoadScrollValue,
+                firstLoadCompleted = timelineUiState.firstLoadCompleted,
                 currentTimeInHours = (localTime.minute / 60f) + localTime.hour,
                 scrollValue = timelineUiState.scrollValue,
                 scale = timelineUiState.scale,

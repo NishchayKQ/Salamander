@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import nish.wry.salamander.R
 
@@ -96,7 +95,7 @@ fun SalamanderSwitch(
                 thumbContent = if (checked) {
                     {
                         Icon(
-                            imageVector = Icons.Filled.Check,
+                            painter = painterResource(R.drawable.outline_check_24),
                             contentDescription = null,
                             modifier = Modifier.size(SwitchDefaults.IconSize)
                         )

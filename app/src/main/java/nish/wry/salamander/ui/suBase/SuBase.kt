@@ -17,9 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
@@ -71,6 +69,7 @@ fun SuBase(
     val is24Hour by viewModel.is24Hour.collectAsState()
     val currentTime by viewModel.currentTime.collectAsState()
 
+    val perCategoryDurationUiData by viewModel.perCategoryDurationUiData.collectAsState()
     val currentActivityInterval by viewModel.currentActivity.collectAsState()
     val activityHistoryList by viewModel.activityUiDataFlow.collectAsState()
     val categoryList by viewModel.categoryListFlow.collectAsState()
@@ -140,6 +139,7 @@ fun SuBase(
                 currentTime = currentTime,
                 modifier = Modifier.fillMaxWidth()
             )
+//            ActivityPieChart(modifier = Modifier.height(1200.dp))
 
 
         }
@@ -221,7 +221,7 @@ private fun SingleCategoryButton(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             if (isSelected) {
-                Icon(Icons.Default.Check, null)
+                Icon(painterResource(R.drawable.outline_check_24), null)
             }
         }
 
@@ -235,7 +235,7 @@ private fun AddCategory(
 ) {
     Column(modifier = modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
         IconButton(onClick = onClick) {
-            Icon(Icons.Default.Add, null)
+            Icon(painterResource(R.drawable.outline_add_24), null)
         }
     }
 }
