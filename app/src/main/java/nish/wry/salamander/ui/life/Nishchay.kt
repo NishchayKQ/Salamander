@@ -17,12 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
-import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
 import kotlin.time.Instant
 
@@ -38,17 +37,17 @@ object NishchayScreenDestination
 // payment records will move over to subset of this screen in future
 @Composable
 fun NishchayScreen(
-    onScanQrClicked: () -> Unit,
     onPaymentRecordClicked: (Int) -> Unit,
+    onAddPaymentRecordClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PaymentHistoryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: PaymentHistoryViewModel = hiltViewModel(),
 ) {
     // Collect the Flow as LazyPagingItems
     val lazyTransactionItems = viewModel.transactions.collectAsLazyPagingItems()
     Scaffold(
         modifier.fillMaxSize(), floatingActionButton = {
-            FloatingActionButton(onClick = onScanQrClicked) {
-                Icon(painterResource(R.drawable.baseline_qr_code_scanner_24), null)
+            FloatingActionButton(onClick = onAddPaymentRecordClicked) {
+                Icon(painterResource(R.drawable.outline_add_24), null)
             }
         }) { innerPadding ->
         Column(

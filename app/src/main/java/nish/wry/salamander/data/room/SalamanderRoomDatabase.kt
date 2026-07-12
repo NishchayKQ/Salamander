@@ -1,8 +1,6 @@
 package nish.wry.salamander.data.room
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import nish.wry.salamander.data.room.life.PaymentChip
@@ -36,26 +34,7 @@ abstract class SalamanderRoomDatabase : RoomDatabase() {
 
     abstract fun dailyLogDao(): DailyLogDao
 
-    abstract fun paymentChipDao() : PaymentChipDao
+    abstract fun paymentChipDao(): PaymentChipDao
 
     abstract fun paymentRecordDao(): PaymentRecordDao
-
-    companion object {
-
-        @Volatile
-        private var Instance: SalamanderRoomDatabase? = null
-
-        fun getDatabase(context: Context): SalamanderRoomDatabase {
-            return Instance ?: synchronized(this) {
-                Room.databaseBuilder(
-                    context = context,
-                    klass = SalamanderRoomDatabase::class.java,
-                    name = "salamander_database"
-                )
-                    .fallbackToDestructiveMigration(true)
-//                    .createFromAsset()
-                    .build().also { Instance = it }
-            }
-        }
-    }
 }

@@ -4,21 +4,16 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import kotlinx.coroutines.MainScope
+import dagger.hilt.android.HiltAndroidApp
 import nish.wry.salamander.data.Priority
 
-
+@HiltAndroidApp
 class SalamanderApplication : Application() {
-    lateinit var container: AppContainer
-
     override fun onCreate() {
         super.onCreate()
 
         // create notification channels our app will use
         createNotificationChannel()
-
-        // TODO check if this scope is okay
-        container = AppDataContainer(coroutineScope = MainScope(), context = this)
     }
 
     private fun createNotificationChannel() {

@@ -7,6 +7,7 @@ import nish.wry.salamander.data.room.task.ChipDao
 import nish.wry.salamander.data.room.task.Task
 import nish.wry.salamander.data.room.task.TaskDao
 import java.util.Calendar
+import javax.inject.Inject
 
 interface TaskRepository {
     fun getAllChips(): Flow<List<Chip>>
@@ -40,7 +41,10 @@ interface TaskRepository {
 
 }
 
-class OfflineTaskRepository(private val taskDao: TaskDao, private val chipDao: ChipDao) :
+class OfflineTaskRepository @Inject constructor(
+    private val taskDao: TaskDao,
+    private val chipDao: ChipDao,
+) :
     TaskRepository {
     override fun getAllChips(): Flow<List<Chip>> = chipDao.getAllChips()
 

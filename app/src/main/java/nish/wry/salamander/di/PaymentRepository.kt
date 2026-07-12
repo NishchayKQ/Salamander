@@ -9,12 +9,15 @@ import nish.wry.salamander.data.room.life.PaymentChipDao
 import nish.wry.salamander.data.room.life.PaymentRecord
 import nish.wry.salamander.data.room.life.PaymentRecordDao
 import nish.wry.salamander.data.room.life.PendingTransactionRecord
+import javax.inject.Inject
 import kotlin.time.Clock
 
 interface PaymentRepository {
     suspend fun addPaymentChip(paymentChip: PaymentChip)
 
     suspend fun updatePaymentChip(paymentChip: PaymentChip)
+
+    suspend fun deletePaymentChip(paymentChipId: Int)
 
     suspend fun addPaymentRecord(paymentRecord: PaymentRecord)
 
@@ -26,6 +29,8 @@ interface PaymentRepository {
 
     fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip>
 
+    fun getPaymentRecord(paymentRecordId: Int): Flow<PaymentRecord>
+
     fun getAllSuccessfulPayments(): Flow<PagingData<PaymentRecord>>
 
     suspend fun addPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
@@ -33,10 +38,11 @@ interface PaymentRepository {
     suspend fun confirmPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
 }
 
-class OfflinePaymentRepository(
+class OfflinePaymentRepository @Inject constructor(
     private val paymentChipDao: PaymentChipDao,
     private val paymentRecordDao: PaymentRecordDao,
     // we pass this so that in unit testing we can pass custom clocks
+    // unfortunately hilt uses java so it can't see this default value, and we had to add a provides method
     private val clock: Clock = Clock.System,
 ) : PaymentRepository {
     override suspend fun addPaymentChip(paymentChip: PaymentChip) =
@@ -44,6 +50,9 @@ class OfflinePaymentRepository(
 
     override suspend fun updatePaymentChip(paymentChip: PaymentChip) =
         paymentChipDao.update(paymentChip = paymentChip)
+
+    override suspend fun deletePaymentChip(paymentChipId: Int) =
+        paymentChipDao.delete(paymentChipId)
 
     override suspend fun addPaymentRecord(paymentRecord: PaymentRecord) =
         paymentRecordDao.insert(paymentRecord = paymentRecord)
@@ -58,6 +67,9 @@ class OfflinePaymentRepository(
 
     override fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip> =
         paymentChipDao.getPaymentChip(paymentChipId = paymentChipId)
+
+    override fun getPaymentRecord(paymentRecordId: Int): Flow<PaymentRecord> =
+        paymentRecordDao.getPaymentRecord(paymentRecordId)
 
     override fun getAllSuccessfulPayments(): Flow<PagingData<PaymentRecord>> = Pager(
         config = PagingConfig(

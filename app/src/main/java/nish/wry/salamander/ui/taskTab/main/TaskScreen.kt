@@ -14,11 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.data.Constants
-import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
 import nish.wry.salamander.ui.taskTab.TaskTopAppBar
 import nish.wry.salamander.ui.taskTab.timeline.CurrentTimeDivider
@@ -43,7 +42,7 @@ fun TaskScreen(
     onEditChipClicked: (Int) -> Unit,
     onTaskClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: TaskViewModel = hiltViewModel(),
 ) {
     val timelineUiState by viewModel.timelineUiState.collectAsState()
     val taskScreenUiState by viewModel.taskScreenUiState.collectAsState()

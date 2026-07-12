@@ -5,9 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.serialization.Serializable
-import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.taskTab.ChipOrTaskEntryBody
 
 @Serializable
@@ -16,10 +15,12 @@ object CreateTaskDestination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateTask(
-    onCreateChip: () -> Unit,
+    onCreateChipClicked: () -> Unit,
+    onEditChipClicked: (Int) -> Unit,
+    onDeleteChipClicked: (Int) -> Unit,
     exitCreateTask: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CreateTaskViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: CreateTaskViewModel = hiltViewModel(),
 ) {
     val chips by viewModel.chips.collectAsState()
     val taskUiState by viewModel.taskUiState.collectAsState()
@@ -40,8 +41,10 @@ fun CreateTask(
         saveData = viewModel::onSaveTaskClicked,
         onExitRequested = exitCreateTask,
         chips = chips,
-        onCreateChip = onCreateChip,
-        onChipSelected = viewModel::onChipSelected,
+        onCreateChip = onCreateChipClicked,
+        onChipClicked = viewModel::onChipSelected,
+        onEditChipClicked = onEditChipClicked,
+        onDeleteChipClicked = onDeleteChipClicked,
         modifier = modifier
     )
 

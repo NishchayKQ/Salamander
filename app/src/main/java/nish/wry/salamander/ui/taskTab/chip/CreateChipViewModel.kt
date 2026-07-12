@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -20,9 +21,11 @@ import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.di.TaskRepository
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import java.util.Calendar
+import javax.inject.Inject
 
 // TODO merge both Task and Chip viewmodel with use case...
-class CreateChipViewModel(
+@HiltViewModel
+class CreateChipViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
 ) : ViewModel() {

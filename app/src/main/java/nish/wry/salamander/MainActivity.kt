@@ -9,11 +9,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
-import nish.wry.salamander.di.SalamanderApplication
+import dagger.hilt.android.AndroidEntryPoint
+import nish.wry.salamander.data.DateTimeTracker
 import nish.wry.salamander.ui.SalamanderApp
 import nish.wry.salamander.ui.theme.SalamanderTheme
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var dateTimeTracker: DateTimeTracker
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +37,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        // TODO is this ok?
-       (application as SalamanderApplication).container.dateTimeTracker.refresh()
+        dateTimeTracker.refresh()
     }
 
     override fun onStop() {
         super.onStop()
-        (application as SalamanderApplication).container.dateTimeTracker.stop()
+        dateTimeTracker.stop()
     }
 }
 

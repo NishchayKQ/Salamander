@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
     alias(libs.plugins.compose.compiler)
 
     // Kotlin serialization plugin for type safe routes and navigation arguments
@@ -21,7 +22,7 @@ ksp {
 
 android {
     namespace = "nish.wry.salamander"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "nish.wry.salamander"
@@ -49,9 +50,9 @@ android {
         // For AGP 4.1+
         isCoreLibraryDesugaringEnabled = true
 
-        // Sets Java compatibility to Java 8
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        // Sets Java compatibility to Java 17 (needed for modern hilt & compose - https://developer.android.com/training/dependency-injection/hilt-android#setup
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     // https://stackoverflow.com/a/79682146/23121081
@@ -63,7 +64,7 @@ android {
     // https://stackoverflow.com/questions/77363060/how-to-replace-the-deprecated-kotlinoptions-in-a-java-library-kotlin-module
     kotlin {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
+            jvmTarget = JvmTarget.JVM_17
         }
     }
     buildFeatures {
@@ -131,6 +132,10 @@ dependencies {
     // https://stackoverflow.com/questions/75151424/android-paging-3-codelabs-failed-on-room-paging
     // https://maven.google.com/web/index.html?q=paging#androidx.room:room-paging
     implementation(libs.androidx.room.paging)
+
+    implementation(libs.hilt.android) //for hilt https://developer.android.com/training/dependency-injection/hilt-android
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
 
 
 

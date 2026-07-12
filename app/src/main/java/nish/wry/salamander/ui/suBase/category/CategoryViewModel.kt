@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -11,9 +12,11 @@ import nish.wry.salamander.data.Constants
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.room.suBase.Category
 import nish.wry.salamander.di.ActivityRepository
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class CategoryViewModel(
+@HiltViewModel
+class CategoryViewModel @Inject constructor(
     private val activityRepository: ActivityRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

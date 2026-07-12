@@ -5,9 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.serialization.Serializable
-import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.taskTab.ChipOrTaskEntryBody
 
 @Serializable
@@ -18,7 +17,7 @@ object CreateChipDestination
 fun CreateChip(
     exitChip: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CreateChipViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: CreateChipViewModel = hiltViewModel(),
 ) {
     val chipUiState by viewModel.chipUiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()

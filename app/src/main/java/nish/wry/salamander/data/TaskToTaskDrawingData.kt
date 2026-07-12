@@ -10,20 +10,12 @@ import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import nish.wry.salamander.ui.taskTab.timeline.TimelineScope.taskData
 import java.util.Calendar
 import java.util.PriorityQueue
+import javax.inject.Inject
+import javax.inject.Singleton
 
 // TODO LocalDate.ofEpochDay()
-class TaskToTaskDrawingData private constructor(private val repository: TaskRepository) {
-    companion object {
-        @Volatile
-        private var instance: TaskToTaskDrawingData? = null
-
-        fun getInstance(repository: TaskRepository): TaskToTaskDrawingData {
-            return instance ?: synchronized(this) {
-                instance ?: TaskToTaskDrawingData(repository).also { instance = it }
-            }
-        }
-    }
-
+@Singleton
+class TaskToTaskDrawingData @Inject constructor(private val repository: TaskRepository) {
     /**days are saved with respect to today,
      * ie at key=0 its today, at 1 its tomorrow, -1 is yesterday**/
     operator fun get(key: Int): Flow<List<TaskDrawingData>> {

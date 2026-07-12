@@ -2,6 +2,7 @@ package nish.wry.salamander.data
 
 import android.content.Context
 import android.text.format.DateFormat
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -12,10 +13,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 // TODO should not run on main dispatcher
-class DateTimeTracker(
-    private val context: Context,
+@Singleton
+class DateTimeTracker @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val coroutineScope: CoroutineScope,
 ) {
     private val _currentTime: MutableStateFlow<LocalTime> = MutableStateFlow(LocalTime.now())
@@ -43,11 +48,13 @@ class DateTimeTracker(
                 _currentTime.update { now }
             }
 
-            _currentDate.update { today }
+            if (_currentDate.value != today) {
+                _currentDate.update { today }
+            }
 
             // Delay until next minute + 1 second to avoid drift
             val delayMillis: Long = (60 - now.second) * 1000L + 1000
-            delay(delayMillis)
+            delay(delayMillis.milliseconds)
         }
     }
 

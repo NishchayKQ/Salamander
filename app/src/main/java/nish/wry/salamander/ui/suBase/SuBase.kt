@@ -38,13 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.data.room.suBase.ActivityUiData
 import nish.wry.salamander.data.room.suBase.CategoryUiData
-import nish.wry.salamander.ui.AppViewModelProvider
 import nish.wry.salamander.ui.navigation.MainDestination
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -63,7 +62,7 @@ object SuBaseScreenDestination
 fun SuBase(
     onAddCategoryClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SubBaseViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: SubBaseViewModel = hiltViewModel(),
 ) {
     val suBaseUiState by viewModel.suBaseUiState.collectAsState()
     val is24Hour by viewModel.is24Hour.collectAsState()

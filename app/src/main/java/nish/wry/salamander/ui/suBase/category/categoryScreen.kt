@@ -30,12 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import nish.wry.salamander.R
 import nish.wry.salamander.data.Constants
-import nish.wry.salamander.ui.AppViewModelProvider
 import kotlin.math.roundToInt
 
 @Serializable
@@ -51,7 +50,7 @@ data class EditCategoryDestination(
 fun CategoryScreen(
     exitScreen: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CategoryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: CategoryViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()

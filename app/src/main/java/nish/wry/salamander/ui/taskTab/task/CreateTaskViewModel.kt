@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,8 +24,10 @@ import nish.wry.salamander.ui.navigation.EditTaskDestination
 import nish.wry.salamander.ui.taskTab.chip.GenericTaskOrChipUiState
 import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
+import javax.inject.Inject
 
-class CreateTaskViewModel(
+@HiltViewModel
+class CreateTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
     getAllChipsUseCase: GetAllChipsUseCase<Chip>,
