@@ -1,0 +1,433 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 11,
+    "identityHash": "f5fa8c7cf17b511ebc85a2ae8e8a4872",
+    "entities": [
+      {
+        "tableName": "chip",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `for_grouping_only` INTEGER NOT NULL, `weekdays_bitflag` INTEGER NOT NULL, `date_time` INTEGER, `floating_offset_hours` INTEGER, `priority` INTEGER NOT NULL, `deleted` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "forGroupingOnly",
+            "columnName": "for_grouping_only",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "repeatOnDaysBitFlag",
+            "columnName": "weekdays_bitflag",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateTime",
+            "columnName": "date_time",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "floatingOffsetHours",
+            "columnName": "floating_offset_hours",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "priority",
+            "columnName": "priority",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "task",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `task_chip` INTEGER NOT NULL, `name` TEXT NOT NULL, `weekdays_bitflag` INTEGER NOT NULL, `date_time` INTEGER, `floating_offset_hours` INTEGER, `priority` INTEGER NOT NULL, FOREIGN KEY(`task_chip`) REFERENCES `chip`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chipId",
+            "columnName": "task_chip",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "repeatOnDaysBitFlag",
+            "columnName": "weekdays_bitflag",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateTime",
+            "columnName": "date_time",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "offsetHours",
+            "columnName": "floating_offset_hours",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "priority",
+            "columnName": "priority",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_task_task_chip",
+            "unique": false,
+            "columnNames": [
+              "task_chip"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_task_task_chip` ON `${TABLE_NAME}` (`task_chip`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chip",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "task_chip"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "activity_interval",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`activity_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `category_id` INTEGER NOT NULL, `day_id` INTEGER NOT NULL, `start` INTEGER NOT NULL, `end` INTEGER, `desc` TEXT, FOREIGN KEY(`day_id`) REFERENCES `daily_log`(`day_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`category_id`) REFERENCES `category`(`category_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "activityId",
+            "columnName": "activity_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayId",
+            "columnName": "day_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "start",
+            "columnName": "start",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "end",
+            "columnName": "end",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "desc",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "activity_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_activity_interval_category_id",
+            "unique": false,
+            "columnNames": [
+              "category_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activity_interval_category_id` ON `${TABLE_NAME}` (`category_id`)"
+          },
+          {
+            "name": "index_activity_interval_day_id",
+            "unique": false,
+            "columnNames": [
+              "day_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activity_interval_day_id` ON `${TABLE_NAME}` (`day_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "daily_log",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "day_id"
+            ],
+            "referencedColumns": [
+              "day_id"
+            ]
+          },
+          {
+            "table": "category",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "category_id"
+            ],
+            "referencedColumns": [
+              "category_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "category",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`category_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `goal_time_in_mins` INTEGER, `deleted` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "categoryId",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "goalTimeInMins",
+            "columnName": "goal_time_in_mins",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "category_id"
+          ]
+        }
+      },
+      {
+        "tableName": "daily_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`day_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `note` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "dayId",
+            "columnName": "day_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "day_id"
+          ]
+        }
+      },
+      {
+        "tableName": "payment_chip",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payment_chip_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `default_merchant_name` TEXT, `preferred_limit` REAL, `deleted` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "paymentChipId",
+            "columnName": "payment_chip_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultMerchantName",
+            "columnName": "default_merchant_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "preferredLimit",
+            "columnName": "preferred_limit",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "payment_chip_id"
+          ]
+        }
+      },
+      {
+        "tableName": "payment_record",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payment_record_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `payment_chip_id` INTEGER, `transaction_pending` INTEGER NOT NULL, `amount` REAL NOT NULL, `merchant_name` TEXT NOT NULL, `transaction_note` TEXT, `time_of_transaction` INTEGER NOT NULL, `upi_app_enum` TEXT NOT NULL, FOREIGN KEY(`payment_chip_id`) REFERENCES `payment_chip`(`payment_chip_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "paymentRecordId",
+            "columnName": "payment_record_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paymentChipId",
+            "columnName": "payment_chip_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "transactionPending",
+            "columnName": "transaction_pending",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "merchantName",
+            "columnName": "merchant_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transactionNote",
+            "columnName": "transaction_note",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "timeOfTransaction",
+            "columnName": "time_of_transaction",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upiApp",
+            "columnName": "upi_app_enum",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "payment_record_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_payment_record_transaction_pending_upi_app_enum",
+            "unique": false,
+            "columnNames": [
+              "transaction_pending",
+              "upi_app_enum"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_payment_record_transaction_pending_upi_app_enum` ON `${TABLE_NAME}` (`transaction_pending`, `upi_app_enum`)"
+          },
+          {
+            "name": "index_payment_record_payment_chip_id",
+            "unique": false,
+            "columnNames": [
+              "payment_chip_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_payment_record_payment_chip_id` ON `${TABLE_NAME}` (`payment_chip_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "payment_chip",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "payment_chip_id"
+            ],
+            "referencedColumns": [
+              "payment_chip_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5fa8c7cf17b511ebc85a2ae8e8a4872')"
+    ]
+  }
+}
