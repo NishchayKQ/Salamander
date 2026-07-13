@@ -111,7 +111,7 @@
             },
             "currentLayoutLang": "en",
             "position": "top",
-            "offsetY": 5,
+            "offsetY": 8,
             "lineHeight": 110,
             "subheadlineEnabled": false,
             "subheadlines": {
@@ -174,7 +174,7 @@
           },
           "screenshot": {
             "scale": 85,
-            "y": -20,
+            "y": 120,
             "x": 50,
             "rotation": 0,
             "perspective": 0,
@@ -224,8 +224,8 @@
               }
             },
             "currentLayoutLang": "en",
-            "position": "bottom",
-            "offsetY": 0,
+            "position": "top",
+            "offsetY": 8,
             "lineHeight": 110,
             "subheadlineEnabled": false,
             "subheadlines": {
@@ -400,7 +400,7 @@
           },
           "screenshot": {
             "scale": 85,
-            "y": -20,
+            "y": 120,
             "x": 50,
             "rotation": 0,
             "perspective": 0,
@@ -448,8 +448,8 @@
               }
             },
             "currentLayoutLang": "en",
-            "position": "bottom",
-            "offsetY": 4,
+            "position": "top",
+            "offsetY": 5,
             "lineHeight": 110,
             "subheadlineEnabled": true,
             "subheadlines": {
@@ -473,8 +473,8 @@
           "overrides": {}
         }
       ],
-      "selectedIndex": 1,
-      "outputDevice": "android-phone",
+      "selectedIndex": 0,
+      "outputDevice": "iphone-6.9",
       "customWidth": 1320,
       "customHeight": 2868,
       "currentLanguage": "en",
