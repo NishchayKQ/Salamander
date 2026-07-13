@@ -1,11 +1,10 @@
-- multiple viewmodel with viewmodel provider
-- data persistence using room
-- saving state from system init process death using saved state handle
-- custom layout with Layout composable
-- unit testing + instrumental testing
-- adaptive app
-- dependency injection
-- separation of concerns design, ui layer, domain layer, data layer
-- type safe navigation using NavGraph
-- data exposed to ui layer from db using cold flows from room and into hot StateFlows when actively used by user
-- has an algorithm to put task in place as per available space on screen (handling task that occur at the same time)
+# 🦎 Salamander
+Salamander is cool
+
+# Previews
+<p align="center">
+  <img src="screenshots/screenshot-1.png" width="23%" alt="Salamander Daily Planner">
+  <img src="screenshots/screenshot-2.png" width="23%" alt="Salamander Task Scheduling">
+  <img src="screenshots/screenshot-3.png" width="23%" alt="Salamander Time Tracking">
+  <img src="screenshots/screenshot-4.png" width="23%" alt="Salamander Expense Tracking">
+</p>
