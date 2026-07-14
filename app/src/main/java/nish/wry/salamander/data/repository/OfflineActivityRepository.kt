@@ -1,4 +1,4 @@
-package nish.wry.salamander.di
+package nish.wry.salamander.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import nish.wry.salamander.data.room.suBase.ActivityInterval
@@ -6,33 +6,17 @@ import nish.wry.salamander.data.room.suBase.ActivityIntervalDao
 import nish.wry.salamander.data.room.suBase.ActivityUiData
 import nish.wry.salamander.data.room.suBase.Category
 import nish.wry.salamander.data.room.suBase.CategoryDao
+import nish.wry.salamander.data.room.suBase.CategoryDurationUiData
 import nish.wry.salamander.data.room.suBase.CategoryUiData
 import nish.wry.salamander.data.room.suBase.CurrentActivityUiData
 import nish.wry.salamander.data.room.suBase.DailyLog
 import nish.wry.salamander.data.room.suBase.DailyLogDao
+import nish.wry.salamander.domain.repository.ActivityRepository
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
 
-interface ActivityRepository {
-    fun getActivitiesForDay(localDate: LocalDate): Flow<List<ActivityUiData>>
-
-    fun getCurrentActivityInterval(): Flow<CurrentActivityUiData?>
-
-    suspend fun startActivity(activityInterval: ActivityInterval)
-
-    suspend fun endCurrentActivity(localTime: LocalTime)
-
-
-
-    fun getAllCategories(): Flow<List<CategoryUiData>>
-
-    suspend fun addCategory(category: Category)
-
-
-    suspend fun getDayIdForDay(localDate: LocalDate): Int
-}
-
-class OfflineActivityRepository(
+class OfflineActivityRepository @Inject constructor(
     private val activityIntervalDao: ActivityIntervalDao,
     private val categoryDao: CategoryDao,
     private val dailyLogDao: DailyLogDao,
@@ -43,6 +27,9 @@ class OfflineActivityRepository(
 
     override fun getCurrentActivityInterval(): Flow<CurrentActivityUiData?> =
         activityIntervalDao.getCurrentActivityInterval()
+
+    override fun getDurationPerCategoryForDay(localDate: LocalDate): Flow<List<CategoryDurationUiData>> =
+        activityIntervalDao.getGraphDataForDay(localDate)
 
     override suspend fun startActivity(activityInterval: ActivityInterval) =
         activityIntervalDao.addActivityInterval(activityInterval)

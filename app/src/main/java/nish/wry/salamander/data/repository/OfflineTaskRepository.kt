@@ -1,4 +1,4 @@
-package nish.wry.salamander.di
+package nish.wry.salamander.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import nish.wry.salamander.data.Week
@@ -6,40 +6,9 @@ import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.data.room.task.ChipDao
 import nish.wry.salamander.data.room.task.Task
 import nish.wry.salamander.data.room.task.TaskDao
+import nish.wry.salamander.domain.repository.TaskRepository
 import java.util.Calendar
 import javax.inject.Inject
-
-interface TaskRepository {
-    fun getAllChips(): Flow<List<Chip>>
-
-    fun getChipWithId(id: Int): Flow<Chip>
-
-    suspend fun createChip(chip: Chip)
-
-    suspend fun deleteChip(chip: Chip)
-
-    suspend fun updateChip(chip: Chip)
-
-    fun getTasksWithChip(chipId: Int): Flow<List<Task>>
-
-    fun getTaskWithId(id: Int): Flow<Task>
-
-    fun getTaskForDayIncludingOffsetTask(
-        date: Calendar,
-    ): Flow<List<Task>>
-
-    fun getTaskForDay(
-        bitmask: Int,
-        date: Calendar,
-    ): Flow<List<Task>>
-
-    suspend fun createTask(task: Task)
-
-    suspend fun updateTask(task: Task)
-
-    suspend fun deleteTask(task: Task)
-
-}
 
 class OfflineTaskRepository @Inject constructor(
     private val taskDao: TaskDao,
@@ -58,7 +27,7 @@ class OfflineTaskRepository @Inject constructor(
 
     override fun getTasksWithChip(chipId: Int): Flow<List<Task>> = taskDao.getTasksWithChip(chipId)
 
-    override fun getTaskWithId(id: Int): Flow<Task> = taskDao.getTaskWithId(id)
+    override suspend fun getTaskWithId(id: Int): Task? = taskDao.getTaskWithId(id)
 
     override fun getTaskForDayIncludingOffsetTask(
         date: Calendar,

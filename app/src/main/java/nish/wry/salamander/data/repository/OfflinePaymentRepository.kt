@@ -1,4 +1,4 @@
-package nish.wry.salamander.di
+package nish.wry.salamander.data.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,34 +9,9 @@ import nish.wry.salamander.data.room.life.PaymentChipDao
 import nish.wry.salamander.data.room.life.PaymentRecord
 import nish.wry.salamander.data.room.life.PaymentRecordDao
 import nish.wry.salamander.data.room.life.PendingTransactionRecord
+import nish.wry.salamander.domain.repository.PaymentRepository
 import javax.inject.Inject
 import kotlin.time.Clock
-
-interface PaymentRepository {
-    suspend fun addPaymentChip(paymentChip: PaymentChip)
-
-    suspend fun updatePaymentChip(paymentChip: PaymentChip)
-
-    suspend fun deletePaymentChip(paymentChipId: Int)
-
-    suspend fun addPaymentRecord(paymentRecord: PaymentRecord)
-
-    suspend fun updatePaymentRecord(paymentRecord: PaymentRecord)
-
-    suspend fun deletePaymentRecord(paymentRecordId: Int)
-
-    fun getAllPaymentChips(): Flow<List<PaymentChip>>
-
-    fun getPaymentChip(paymentChipId: Int): Flow<PaymentChip>
-
-    fun getPaymentRecord(paymentRecordId: Int): Flow<PaymentRecord>
-
-    fun getAllSuccessfulPayments(): Flow<PagingData<PaymentRecord>>
-
-    suspend fun addPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
-
-    suspend fun confirmPendingTransaction(pendingTransactionRecord: PendingTransactionRecord)
-}
 
 class OfflinePaymentRepository @Inject constructor(
     private val paymentChipDao: PaymentChipDao,

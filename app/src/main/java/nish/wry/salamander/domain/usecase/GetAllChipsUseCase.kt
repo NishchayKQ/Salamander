@@ -1,4 +1,4 @@
-package nish.wry.salamander.di
+package nish.wry.salamander.domain.usecase
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
