@@ -31,6 +31,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,6 @@ import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -144,7 +144,7 @@ fun HourLabels(is24Hour: Boolean) {
         calendar.clear()
         calendar.set(Calendar.HOUR_OF_DAY, 1)
     }
-    val sdf = SimpleDateFormat(if (is24Hour) "H" else "h a", Locale.getDefault())
+    val sdf = SimpleDateFormat(if (is24Hour) "H" else "h a", LocalLocale.current.platformLocale)
 
     val incHourByOne: () -> String = {
         val res = sdf.format(cal.time)
@@ -156,6 +156,7 @@ fun HourLabels(is24Hour: Boolean) {
             incHourByOne(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }
@@ -165,12 +166,16 @@ fun CurrentTimeText(
     is24Hour: Boolean,
     localTime: LocalTime,
 ) {
-    val dtf = DateTimeFormatter.ofPattern(if (is24Hour) "H:mm" else "h:mm", Locale.getDefault())
+    val dtf = DateTimeFormatter.ofPattern(
+        if (is24Hour) "H:mm" else "h:mm",
+        LocalLocale.current.platformLocale
+    )
 
     val errorColor = MaterialTheme.colorScheme.error
 
     Text(
-        localTime.format(dtf), style = MaterialTheme.typography.bodySmall, color = errorColor
+        localTime.format(dtf), style = MaterialTheme.typography.bodySmall, color = errorColor,
+        modifier = Modifier.padding(start = 8.dp)
     )
 }
 
@@ -183,7 +188,7 @@ fun CurrentTimeDivider() {
             .fillMaxWidth()
             .drawWithCache {
                 val path = Path()
-                // both the size of triangle + used for line offset (line starts where triangle ends))
+                // both the size of triangle + used for line offset (line starts where triangle ends)
                 val len = 10.dp.toPx()
                 val xPos = 5.dp.toPx()
 
