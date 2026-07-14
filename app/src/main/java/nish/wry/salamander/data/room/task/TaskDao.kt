@@ -14,7 +14,7 @@ interface TaskDao {
     fun getTasksWithChip(chipId: Int): Flow<List<Task>>
 
     @Query("select * from task where id = :id")
-    fun getTaskWithId(id: Int): Flow<Task>
+    suspend fun getTaskWithId(id: Int): Task?
 
     @Query("select * from task where (date_time between :startDate and :endDate) or (weekdays_bitflag & :bitmask > 0) or (floating_offset_hours is not null)")
     fun getTaskForDayIncludingOffsetTask(
@@ -33,7 +33,7 @@ interface TaskDao {
     ): Flow<List<Task>>
 
     @Insert
-    suspend fun insert(task: Task)
+    suspend fun insert(task: Task) : Long
 
     @Update
     suspend fun update(task: Task)

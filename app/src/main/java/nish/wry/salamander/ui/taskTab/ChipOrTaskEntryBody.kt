@@ -59,10 +59,15 @@ fun ChipOrTaskEntryBody(
     modifier: Modifier = Modifier,
     chips: List<Chip>? = null,
     onCreateChip: (() -> Unit)? = null,
-    onChipSelected: ((Int) -> Unit)? = null,
+    onChipClicked: ((Int) -> Unit)? = null,
+    onEditChipClicked: ((Int) -> Unit)? = null,
+    onDeleteChipClicked: ((Int) -> Unit)? = null,
     onForGroupingOnlyToggled: (() -> Unit)? = null,
 ) {
     val isTaskScreen = onCreateChip != null
+    require((isTaskScreen && chips != null && onChipClicked != null && onEditChipClicked != null && onDeleteChipClicked != null) || !isTaskScreen) {
+        "can't have chips, onCreateChip, onChipClicked, onEditChipClicked, onDeleteChipClicked null on task screen"
+    }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -105,7 +110,7 @@ fun ChipOrTaskEntryBody(
                 )
             }
 
-            if (isTaskScreen && chips != null && onChipSelected != null) {
+            if (isTaskScreen && chips != null && onChipClicked != null && onEditChipClicked != null && onDeleteChipClicked != null) {
                 SalamanderSingleInputChip(
                     chips = chips,
                     selectedChipId = genericTaskOrChipUiState.chipId ?: -1,
@@ -113,11 +118,12 @@ fun ChipOrTaskEntryBody(
                     getChipName = Chip::name,
                     getChipDeleted = Chip::deleted,
                     modifier = Modifier.padding(
-                        start = 24.dp,
-                        bottom = 16.dp
+                        start = 24.dp, bottom = 16.dp
                     ),
-                    onChipSelected = onChipSelected,
-                    onCreateChipClicked = onCreateChip
+                    onChipClicked = onChipClicked,
+                    onEditChipClicked = onEditChipClicked,
+                    onDeleteChipClicked = onDeleteChipClicked,
+                    onCreateChipClicked = onCreateChip,
                 )
             }
             // if its for grouping only then all these are irrelevant

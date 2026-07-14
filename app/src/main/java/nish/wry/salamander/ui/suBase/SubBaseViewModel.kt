@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,25 +22,38 @@ import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.room.suBase.ActivityInterval
 import nish.wry.salamander.data.room.suBase.ActivityUiData
 import nish.wry.salamander.data.room.suBase.Category
+import nish.wry.salamander.data.room.suBase.CategoryDurationUiData
 import nish.wry.salamander.data.room.suBase.CategoryUiData
 import nish.wry.salamander.data.room.suBase.CurrentActivityUiData
-import nish.wry.salamander.di.ActivityRepository
+import nish.wry.salamander.domain.repository.ActivityRepository
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
 
-class SubBaseViewModel(
+@HiltViewModel
+class SubBaseViewModel @Inject constructor(
     dateTimeTracker: DateTimeTracker,
     private val activityRepository: ActivityRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val localDateStateFlow: StateFlow<LocalDate> = dateTimeTracker.currentDate
 
-    val currentTime:StateFlow<LocalTime> = dateTimeTracker.currentTime
+    val currentTime: StateFlow<LocalTime> = dateTimeTracker.currentTime
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val activityUiDataFlow: StateFlow<List<ActivityUiData>> =
         localDateStateFlow.flatMapLatest { localDate ->
             activityRepository.getActivitiesForDay(localDate)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = listOf()
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val perCategoryDurationUiData: StateFlow<List<CategoryDurationUiData>> =
+        localDateStateFlow.flatMapLatest { value: LocalDate ->
+            activityRepository.getDurationPerCategoryForDay(value)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

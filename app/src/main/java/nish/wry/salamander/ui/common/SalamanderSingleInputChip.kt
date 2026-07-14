@@ -2,18 +2,13 @@ package nish.wry.salamander.ui.common
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import nish.wry.salamander.R
 
 /**
@@ -28,7 +23,9 @@ fun <T> SalamanderSingleInputChip(
     getChipId: (T) -> Int,
     getChipName: (T) -> String,
     getChipDeleted: (T) -> Boolean,
-    onChipSelected: (Int) -> Unit,
+    onChipClicked: (Int) -> Unit,
+    onEditChipClicked: (Int) -> Unit,
+    onDeleteChipClicked: (Int) -> Unit,
     onCreateChipClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -40,16 +37,23 @@ fun <T> SalamanderSingleInputChip(
             // don't show deleted items
             if (getChipDeleted(it)) return@forEach
 
-            InputChip(
-                selected = getChipId(it) == selectedChipId,
-                onClick = { onChipSelected(getChipId(it)) },
-                label = { Text(getChipName(it)) },
-                modifier = Modifier.padding(end = 8.dp)
-            )
+            val id = getChipId(it)
+            val chipName = getChipName(it)
+
+                SalamanderChip(
+                    id = id,
+                    selected = id == selectedChipId,
+                    chipName = chipName,
+                    onClick = onChipClicked,
+                    onEditChipClicked = onEditChipClicked,
+                    onDeleteChipClicked = onDeleteChipClicked,
+                    useInputChips = true,
+                )
+
         }
         IconButton(onClick = onCreateChipClicked) {
             Icon(
-                Icons.Default.Add,
+                painterResource(R.drawable.outline_add_24),
                 contentDescription = stringResource(R.string.add_event_chip)
             )
         }
