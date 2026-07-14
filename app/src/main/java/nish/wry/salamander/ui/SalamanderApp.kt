@@ -35,6 +35,8 @@ import nish.wry.salamander.ui.life.PaymentChipScreen
 import nish.wry.salamander.ui.life.PaymentChipScreenDestination
 import nish.wry.salamander.ui.life.PaymentRecordScreen
 import nish.wry.salamander.ui.life.PaymentRecordScreenDestination
+import nish.wry.salamander.ui.navigation.EditPaymentChipDestination
+import nish.wry.salamander.ui.navigation.EditPaymentRecordDestination
 import nish.wry.salamander.ui.suBase.SuBase
 import nish.wry.salamander.ui.suBase.SuBaseScreenDestination
 import nish.wry.salamander.ui.suBase.category.CreateCategoryDestination
@@ -124,7 +126,9 @@ private fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     NavHost(
-        navController = navController, startDestination = MainNishchayDestination, modifier = modifier
+        navController = navController,
+        startDestination = MainTaskDestination,
+        modifier = modifier
 
     ) {
         composable<MainSuBaseDestination> {
@@ -207,15 +211,32 @@ private fun AppNavHost(
 //                            }
 //                        }
                     }
+                    val onEditChipClicked: (Int) -> Unit = {
+                        taskNavController.navigate(EditChipDestination(it))
+                    }
+                    val onDeleteChipClicked: (Int) -> Unit = {
 
+                    }
                     composable<CreateTaskDestination> {
                         CreateTask(
-                            onCreateChip = { taskNavController.navigate(CreateChipDestination) },
+                            onCreateChipClicked = { taskNavController.navigate(CreateChipDestination) },
+                            onEditChipClicked = onEditChipClicked,
+                            onDeleteChipClicked = onDeleteChipClicked,
                             exitCreateTask = {
                                 taskNavController.popBackStack(
                                     TaskTimelineDestination, false
                                 )
                             },
+                            modifier = dividerModifier
+                        )
+                    }
+
+                    composable<EditTaskDestination> {
+                        CreateTask(
+                            onCreateChipClicked = { taskNavController.navigate(CreateChipDestination) },
+                            onEditChipClicked = onEditChipClicked,
+                            onDeleteChipClicked = onDeleteChipClicked,
+                            exitCreateTask = { taskNavController.popBackStack() },
                             modifier = dividerModifier
                         )
                     }
@@ -235,13 +256,6 @@ private fun AppNavHost(
                             modifier = dividerModifier
                         )
                     }
-                    composable<EditTaskDestination> {
-                        CreateTask(
-                            onCreateChip = { taskNavController.navigate(CreateChipDestination) },
-                            exitCreateTask = { taskNavController.popBackStack() },
-                            modifier = dividerModifier
-                        )
-                    }
                 }
             }
 
@@ -254,18 +268,45 @@ private fun AppNavHost(
             ) {
                 composable<NishchayScreenDestination> {
                     NishchayScreen(
-                        onScanQrClicked = { nishchayNavController.navigate(PaymentRecordScreenDestination) },
-                        onPaymentRecordClicked = {}
+                        onPaymentRecordClicked = {
+                            nishchayNavController.navigate(
+                                EditPaymentRecordDestination(it)
+                            )
+                        },
+                        onAddPaymentRecordClicked = {
+                            nishchayNavController.navigate(PaymentRecordScreenDestination)
+                        }
                     )
                 }
 
+                val onEditPaymentChipClicked: (Int) -> Unit = {
+                    nishchayNavController.navigate(EditPaymentChipDestination(it))
+                }
+
                 composable<PaymentRecordScreenDestination> {
-                    PaymentRecordScreen(onCreatePaymentChipClicked = {
-                        nishchayNavController.navigate(PaymentChipScreenDestination)
-                    }, onExitRequested = { nishchayNavController.navigateUp() })
+                    PaymentRecordScreen(
+                        onCreatePaymentChipClicked = {
+                            nishchayNavController.navigate(PaymentChipScreenDestination)
+                        },
+                        onEditChipClicked = onEditPaymentChipClicked,
+                        onExitRequested = { nishchayNavController.navigateUp() })
+                }
+
+                composable<EditPaymentRecordDestination> {
+                    PaymentRecordScreen(
+                        onCreatePaymentChipClicked = {
+                            nishchayNavController.navigate(PaymentChipScreenDestination)
+                        },
+                        onEditChipClicked = onEditPaymentChipClicked,
+                        onExitRequested = { nishchayNavController.navigateUp() })
                 }
 
                 composable<PaymentChipScreenDestination> {
+                    PaymentChipScreen(
+                        onExitRequested = { nishchayNavController.navigateUp() })
+                }
+
+                composable<EditPaymentChipDestination> {
                     PaymentChipScreen(
                         onExitRequested = { nishchayNavController.navigateUp() })
                 }
