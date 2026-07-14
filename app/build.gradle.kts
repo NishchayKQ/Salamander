@@ -19,6 +19,12 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// https://stackoverflow.com/questions/77363060/how-to-replace-the-deprecated-kotlinoptions-in-a-java-library-kotlin-module
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
+}
 
 android {
     namespace = "nish.wry.salamander"
@@ -61,12 +67,6 @@ android {
     // issue tracker - https://issuetracker.google.com/issues/410607888
     kotlin.compilerOptions.optIn.add("kotlin.time.ExperimentalTime")
 
-    // https://stackoverflow.com/questions/77363060/how-to-replace-the-deprecated-kotlinoptions-in-a-java-library-kotlin-module
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
-        }
-    }
     buildFeatures {
         compose = true
     }
@@ -125,7 +125,7 @@ dependencies {
     implementation(libs.androidx.sqlite.ktx)
 
     // enters the demon - paging 3 - https://developer.android.com/jetpack/androidx/releases/paging#kts
-    implementation (libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.runtime)
 //    Jetpack Compose integration
     implementation(libs.androidx.paging.compose)
 
@@ -136,7 +136,6 @@ dependencies {
     implementation(libs.hilt.android) //for hilt https://developer.android.com/training/dependency-injection/hilt-android
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
-
 
 
 //    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
