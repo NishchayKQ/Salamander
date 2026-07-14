@@ -41,6 +41,28 @@ enum class Week(
             return calenderDayToWeekEnum(currentDayOfWeek) or calenderDayToWeekEnum(nextDay)
         }
 
+        /**returns the next calendar day for recurring reminders
+         * throws IllegalArgument Exception if bitmask is 0**/
+        fun findNextCalenderDayForRecurringReminder(calender: Calendar, bitmask: Int): Calendar{
+            require(bitmask != 0)
+
+            var currentDayOfWeek = calender.get(Calendar.DAY_OF_WEEK)
+
+            for (i in 1..7){
+                val nextDay = giveNextValidWeekdayNumber(currentDayOfWeek)
+                val nextWeekEnum = calenderDayToWeekEnum(nextDay)
+
+                if (bitmask and nextWeekEnum != 0){
+                    calender.add(Calendar.DAY_OF_MONTH, i)
+                    return calender
+                }
+
+                currentDayOfWeek = nextDay
+
+            }
+            throw IllegalStateException("no valid day found, this can't be happening!")
+        }
+
         private fun giveNextValidWeekdayNumber(dayOfWeek: Int): Int {
             return if ((dayOfWeek + 1) % 8 == 0) {
                 1

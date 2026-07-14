@@ -21,6 +21,9 @@ object Constants {
     const val GOAL_TIME_SLIDER_DEFAULT_HRS = 0
     const val GOAL_TIME_SLIDER_DEFAULT_MINS = 0
 
+    const val EXTRA_TASK_ID = "TASK_ID"
+    const val EXTRA_TASK_NAME = "TASK_NAME"
+
     val listOfDestination: List<MainDestination> = listOf(
         MainSuBaseDestination, MainTaskDestination, MainNishchayDestination
     )

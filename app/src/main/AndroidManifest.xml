@@ -2,8 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+<!--    for android 12 and below (pre-granted)
+    references: https://developer.android.com/develop/background-work/services/alarms#exact-permission-declare
+                https://www.reddit.com/r/androiddev/comments/10a3lh9/is_my_understanding_on_use_exact_alarm_and/
+-->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
+<!--    for android 13 and above-->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" android:minSdkVersion="33"
+        tools:ignore="ExactAlarmPolicy" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"
+        tools:ignore="FullScreenIntentPolicy" />
     <application
-        android:name=".di.SalamanderApplication"
+        android:name=".SalamanderApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,8 +35,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config"
-                />
+                android:resource="@xml/accessibility_service_config" />
         </service>
         <activity
             android:name=".MainActivity"
@@ -37,6 +47,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ReminderActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true" />
+        <receiver
+            android:name=".scheduler.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

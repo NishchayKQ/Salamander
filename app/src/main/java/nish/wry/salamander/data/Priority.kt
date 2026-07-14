@@ -1,20 +1,38 @@
 package nish.wry.salamander.data
 
-enum class Priority(val id: Int) {
+import android.app.NotificationManager
+
+//note the CHANNEL_ID param of notification builder is the enum's .name
+enum class Priority(val id: Int, val nameSeenToUser: String, val description: String, val importance: Int) {
     /**
-     * low priority task with no notifications
+     * low priority task with notification but no sound
      * **/
-    Low(0),
+    Low(
+        id = 0,
+        nameSeenToUser = "low priority reminders",
+        description = "used for reminders of low priority",
+        importance = NotificationManager.IMPORTANCE_LOW
+    ),
 
     /**
-     * normal priority task with notifications
+     * normal priority task with notifications + sound
      * **/
-    Normal(1),
+    Normal(
+        id = 1,
+        nameSeenToUser = "normal priority reminders",
+        description = "used for reminders of normal priority",
+        importance = NotificationManager.IMPORTANCE_HIGH
+    ),
 
     /**
      * high priority task with full screen dismissable notification
      * **/
-    Critical(2);
+    Critical(
+        id = 2,
+        nameSeenToUser = "critical priority reminders",
+        description = "used for reminders of critical priority",
+        importance = NotificationManager.IMPORTANCE_HIGH
+    );
 
     companion object {
         /**
