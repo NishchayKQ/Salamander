@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 import nish.wry.salamander.data.Constants
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.room.suBase.Category
-import nish.wry.salamander.di.ActivityRepository
+import nish.wry.salamander.domain.repository.ActivityRepository
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
