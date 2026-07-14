@@ -18,7 +18,7 @@ import nish.wry.salamander.data.Priority
 import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
 import nish.wry.salamander.data.room.task.Chip
-import nish.wry.salamander.di.TaskRepository
+import nish.wry.salamander.domain.repository.TaskRepository
 import nish.wry.salamander.ui.navigation.EditChipDestination
 import java.util.Calendar
 import javax.inject.Inject

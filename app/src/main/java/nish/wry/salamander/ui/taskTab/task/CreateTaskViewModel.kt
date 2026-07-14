@@ -1,5 +1,6 @@
 package nish.wry.salamander.ui.taskTab.task
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.lifecycle.SavedStateHandle
@@ -8,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
@@ -18,19 +18,24 @@ import nish.wry.salamander.data.Week
 import nish.wry.salamander.data.or
 import nish.wry.salamander.data.room.task.Chip
 import nish.wry.salamander.data.room.task.Task
-import nish.wry.salamander.di.GetAllChipsUseCase
-import nish.wry.salamander.di.TaskRepository
+import nish.wry.salamander.domain.repository.TaskRepository
+import nish.wry.salamander.domain.usecase.GetAllChipsUseCase
+import nish.wry.salamander.scheduler.Reminder
+import nish.wry.salamander.scheduler.Scheduler
 import nish.wry.salamander.ui.navigation.EditTaskDestination
 import nish.wry.salamander.ui.taskTab.chip.GenericTaskOrChipUiState
 import nish.wry.salamander.ui.taskTab.chip.UiState
 import java.util.Calendar
 import javax.inject.Inject
 
+const val CREATE_TASK_VIEWMODEL = "Create Task ViewModel"
+
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TaskRepository,
     getAllChipsUseCase: GetAllChipsUseCase<Chip>,
+    private val alarmScheduler: Scheduler,
 ) : ViewModel() {
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -43,7 +48,9 @@ class CreateTaskViewModel @Inject constructor(
     init {
         if (taskId != null) {
             viewModelScope.launch {
-                val fetchedTaskUiState = repository.getTaskWithId(taskId).first().toTaskUiState()
+                // this can't be null, but if it is somehow null it will take user to create task screen
+                val task = repository.getTaskWithId(taskId) ?: return@launch
+                val fetchedTaskUiState = task.toTaskUiState()
                 _taskUiStateUiState.update { fetchedTaskUiState }
                 _uiState.update { UiState(offsetHoursString = fetchedTaskUiState.offsetHours.toString()) }
             }
@@ -165,13 +172,26 @@ class CreateTaskViewModel @Inject constructor(
 
     suspend fun onSaveTaskClicked(uiState: GenericTaskOrChipUiState = taskUiState.value) {
         if (uiState.name.isNotBlank() && uiState.chipId != null) {
-            if (taskId != null) {
+            uiState.selectedTime.set(Calendar.SECOND, 0)
+            uiState.selectedTime.set(Calendar.MILLISECOND, 0)
+
+            val id = if (taskId != null) {
                 repository.updateTask(uiState.toTask(taskId))
+                taskId
             } else {
+                // returns created task's id
                 repository.createTask(uiState.toTask())
             }
             _taskUiStateUiState.update { GenericTaskOrChipUiState() }
             _uiState.update { UiState() }
+
+            if (!uiState.timeless) { // if it's not timeless we have a time
+                val reminder = Reminder(
+                    id = id.toInt(), timeInMillis = uiState.selectedTime.timeInMillis
+                )
+                Log.d(CREATE_TASK_VIEWMODEL, "scheduled an alarm for task: $id at ${uiState.selectedTime.time}")
+                alarmScheduler.schedule(reminder)
+            }
         }
     }
 
