@@ -7,10 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import nish.wry.salamander.data.room.SalamanderRoomDatabase
+import javax.inject.Singleton
 import kotlin.time.Clock
 
 

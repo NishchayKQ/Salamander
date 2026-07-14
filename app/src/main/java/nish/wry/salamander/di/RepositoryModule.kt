@@ -4,6 +4,12 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import nish.wry.salamander.domain.repository.ActivityRepository
+import nish.wry.salamander.data.repository.OfflineActivityRepository
+import nish.wry.salamander.data.repository.OfflinePaymentRepository
+import nish.wry.salamander.data.repository.OfflineTaskRepository
+import nish.wry.salamander.domain.repository.PaymentRepository
+import nish.wry.salamander.domain.repository.TaskRepository
 import javax.inject.Singleton
 
 @Module

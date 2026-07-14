@@ -4,8 +4,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import nish.wry.salamander.domain.repository.PaymentRepository
+import nish.wry.salamander.domain.repository.TaskRepository
 import nish.wry.salamander.data.room.life.PaymentChip
 import nish.wry.salamander.data.room.task.Chip
+import nish.wry.salamander.domain.usecase.GetAllChipsUseCase
 
 @Module
 @InstallIn(SingletonComponent::class)

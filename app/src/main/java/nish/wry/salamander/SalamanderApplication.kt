@@ -1,8 +1,10 @@
-package nish.wry.salamander.di
+package nish.wry.salamander
 
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
 import nish.wry.salamander.data.Priority
@@ -31,6 +33,15 @@ class SalamanderApplication : Application() {
 
                 val channel = NotificationChannel(priority.name, name, importance).apply {
                     description = descriptionText
+                    // setting channel config for Critical & Normal Task
+                    if (priority == Priority.Critical){
+                        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                        val audioAttributes = AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .build()
+
+                        setSound(alarmSound, audioAttributes)
+                    }
                 }
 
                 // Register the channel with the system.
