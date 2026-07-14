@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import nish.wry.salamander.data.Constants.MINS_IN_A_DAY
 import nish.wry.salamander.data.room.task.Task
-import nish.wry.salamander.di.TaskRepository
+import nish.wry.salamander.domain.repository.TaskRepository
 import nish.wry.salamander.ui.taskTab.main.TaskDrawingData
 import nish.wry.salamander.ui.taskTab.timeline.TimelineScope.taskData
 import java.util.Calendar

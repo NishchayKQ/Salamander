@@ -54,7 +54,7 @@ fun TaskScreen(
     val pagerState = rememberPagerState(initialPage = startPage) {
         Constants.PAGER_LIMIT
     }
-    // TODO top app bar?? smaller search bar nag ??
+
     Scaffold(
         topBar = {
             TaskTopAppBar(

@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,6 +24,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -45,6 +47,8 @@ fun TimelineLayout(
     currentTimeDivider: @Composable () -> Unit,
     tasksComposable: @Composable () -> Unit,
     saveScrollAndScale: (scroll: Int, scaleY: Float) -> Unit,
+    firstLoadCompleted: Boolean,
+    firstLoadScrollValue: Float,
     currentTimeInHours: Float,
     scrollValue: Int,
     scale: Float,
@@ -52,6 +56,15 @@ fun TimelineLayout(
 ) {
     var scaleY by rememberSaveable { mutableFloatStateOf(scale) }
     val scrollState = rememberScrollState(scrollValue)
+
+    if (isToday && !firstLoadCompleted) {
+        val value = with(LocalDensity.current) {
+            firstLoadScrollValue.dp.toPx().roundToInt()
+        }
+        LaunchedEffect(Unit) {
+            scrollState.scrollTo(value)
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -214,6 +227,8 @@ private fun TimelineLayoutPreview() {
         saveScrollAndScale = { _, _ -> },
         scrollValue = 0,
         scale = 1.5f,
+        firstLoadCompleted = false,
+        firstLoadScrollValue = 0f,
     )
 }
 

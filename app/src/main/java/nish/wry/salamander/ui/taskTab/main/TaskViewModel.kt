@@ -5,9 +5,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -16,17 +16,25 @@ import nish.wry.salamander.data.DateTimeTracker
 import nish.wry.salamander.data.MutableSaveStateFlow
 import nish.wry.salamander.data.TaskDataSource
 import nish.wry.salamander.data.room.task.Chip
-import nish.wry.salamander.di.GetAllChipsUseCase
-import nish.wry.salamander.di.TaskRepository
+import nish.wry.salamander.domain.repository.TaskRepository
+import nish.wry.salamander.domain.usecase.GetAllChipsUseCase
+import nish.wry.salamander.scheduler.Scheduler
 import java.time.LocalTime
+import javax.inject.Inject
 
-class TaskViewModel(
+@HiltViewModel
+class TaskViewModel @Inject constructor(
     val taskDataSource: TaskDataSource,
     private val repository: TaskRepository,
     dateTimeTracker: DateTimeTracker,
     savedStateHandle: SavedStateHandle,
-    getAllChipsUseCase: GetAllChipsUseCase,
+    getAllChipsUseCase: GetAllChipsUseCase<Chip>,
+    private val alarmScheduler: Scheduler
 ) : ViewModel() {
+
+    val localTime: StateFlow<LocalTime> = dateTimeTracker.currentTime
+    val is24Hour: StateFlow<Boolean> = dateTimeTracker.is24Hour
+    //    val localDate:Nothing = dateTimeTracker.currentDate.collect { }
 
     // timeline stuff
     private val _timelineUiState = MutableSaveStateFlow(
@@ -60,11 +68,6 @@ class TaskViewModel(
     // chips
     val chips: StateFlow<List<Chip>> = getAllChipsUseCase(viewModelScope)
 
-    val localTime: StateFlow<LocalTime> = dateTimeTracker.currentTime
-    val is24Hour: StateFlow<Boolean> = dateTimeTracker.is24Hour
-
-//    val localDate:Nothing = dateTimeTracker.currentDate.collect { }
-
     fun onChipClicked(chipId: Int) {
         _timelineUiState.update { cur ->
             val updateChipIds = if (chipId in cur.selectedChipIDs) {
@@ -74,17 +77,18 @@ class TaskViewModel(
         }
     }
 
-    // TODO the scope and stuff, repo should put it in recycle bin with today's date as deleted date, delete in 30 days
     fun onDeleteTaskClicked(taskId: Int) {
         viewModelScope.launch {
-            val task = repository.getTaskWithId(taskId).first()
+            val task = repository.getTaskWithId(taskId) ?: return@launch
             repository.deleteTask(task)
+            alarmScheduler.cancel(task.id)
         }
     }
 
+    // when a user's scroll is saved we don't need to use firstLoadScrollValue anymore
     fun saveScrollState(scroll: Int, scale: Float) {
         _timelineUiState.update { cur ->
-            cur.copy(scrollValue = scroll, scale = scale)
+            cur.copy(scrollValue = scroll, scale = scale, firstLoadCompleted = true)
         }
     }
 
@@ -127,11 +131,20 @@ class TaskViewModel(
     }
 
 }
-
+// #FIXME selected chips remembers the ones that were deleted
+/**
+ * @param scale the zoom level of the timeline
+ * @param scrollValue the user scrolled position
+ * @param firstLoadScrollValue current time position in float, convert to dp and then pixels for scrollPosition
+ * @param firstLoadCompleted if [TimelineUiState] has been created before, this is for [firstLoadScrollValue], we don't want to override user's scroll value
+ * @param selectedChipIDs chips user has toggled
+ * **/
 @Parcelize
 data class TimelineUiState(
     val scale: Float = 1.5f,
     val scrollValue: Int = 0,
+    val firstLoadScrollValue: Float = (scale * Constants.HOUR_HEIGHT) * with(LocalTime.now()) { (minute / 60f) + hour },
+    val firstLoadCompleted: Boolean = false,
     val selectedChipIDs: Set<Int> = emptySet(),
 ) : Parcelable
 
