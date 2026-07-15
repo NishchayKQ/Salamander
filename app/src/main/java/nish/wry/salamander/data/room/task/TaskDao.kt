@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import nish.wry.salamander.scheduler.ScheduledTask
 import java.util.Calendar
 
 @Dao
@@ -32,8 +33,11 @@ interface TaskDao {
         endDate: Calendar,
     ): Flow<List<Task>>
 
+    @Query("select id, date_time, weekdays_bitflag from task where date_time >= :currentTimeMillis or weekdays_bitflag > 0")
+    suspend fun getAllCalendarRelevantTask(currentTimeMillis: Long): List<ScheduledTask>
+
     @Insert
-    suspend fun insert(task: Task) : Long
+    suspend fun insert(task: Task): Long
 
     @Update
     suspend fun update(task: Task)

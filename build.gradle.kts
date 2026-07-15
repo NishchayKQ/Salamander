@@ -2,7 +2,7 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     // https://developer.android.com/build/migrate-to-ksp#add-ksp
-    id("com.google.devtools.ksp") version "2.3.9" apply false
+    id("com.google.devtools.ksp") version "2.3.10" apply false
     alias(libs.plugins.compose.compiler) apply false
     id("com.google.dagger.hilt.android") version "2.60.1" apply false
 }

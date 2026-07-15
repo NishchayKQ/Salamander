@@ -7,6 +7,7 @@ import nish.wry.salamander.data.room.task.ChipDao
 import nish.wry.salamander.data.room.task.Task
 import nish.wry.salamander.data.room.task.TaskDao
 import nish.wry.salamander.domain.repository.TaskRepository
+import nish.wry.salamander.scheduler.ScheduledTask
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -48,6 +49,9 @@ class OfflineTaskRepository @Inject constructor(
         val endDate = setCalender(date, 24)
         return taskDao.getTaskForDay(bitmask, startDate, endDate)
     }
+
+    override suspend fun getAllCalendarRelevantTask(currentTimeMillis: Long): List<ScheduledTask> =
+        taskDao.getAllCalendarRelevantTask(currentTimeMillis)
 
     override suspend fun createTask(task: Task) = taskDao.insert(task)
 

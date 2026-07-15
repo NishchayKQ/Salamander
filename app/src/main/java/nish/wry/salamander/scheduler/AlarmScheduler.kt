@@ -8,6 +8,8 @@ import android.content.Intent
 import androidx.annotation.RequiresPermission
 import dagger.hilt.android.qualifiers.ApplicationContext
 import nish.wry.salamander.data.Constants
+import timber.log.Timber
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,30 +42,31 @@ class AlarmScheduler @Inject constructor(@param:ApplicationContext private val c
 
         // Create the PendingIntent. The request code (item.id) must be unique
         // for each reminder to avoid them overwriting each other.
-        val alarmIntent: PendingIntent = PendingIntent.getBroadcast(
-            /* context = */ context,
-            /* requestCode = */ reminder.id,
-            /* intent = */ intent,
-            /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val alarmIntent: PendingIntent =
+            PendingIntent.getBroadcast(/* context = */ context,/* requestCode = */
+                reminder.id,/* intent = */
+                intent,/* flags = */
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-        alarmMgr.setExactAndAllowWhileIdle(
-            /* type = */ AlarmManager.RTC_WAKEUP,
-            /* triggerAtMillis = */ reminder.timeInMillis,
-            /* operation = */ alarmIntent
+        alarmMgr.setExactAndAllowWhileIdle(/* type = */ AlarmManager.RTC_WAKEUP,/* triggerAtMillis = */
+            reminder.timeInMillis,/* operation = */
+            alarmIntent
         )
+        Timber.d("Scheduled Task#${reminder.id} for ${Date(reminder.timeInMillis)}")
     }
 
     override fun cancel(id: Int) {
         // To cancel an alarm, you must create a PendingIntent that is
         // identical to the one you used to set it.
         val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            id, // The same unique request code
+            context, id, // The same unique request code
             Intent(context, AlarmReceiver::class.java), // The same intent
             // update current makes it update the pending intent with same request code instead of creating a new intent
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+
+        Timber.d("Cancelled: Task#$id")
 
         alarmMgr.cancel(pendingIntent)
     }

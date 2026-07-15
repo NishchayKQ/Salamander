@@ -69,6 +69,13 @@ android {
 
     buildFeatures {
         compose = true
+        // needed for https://stackoverflow.com/questions/76492296/there-is-no-buildconfig-debug-on-android
+        buildConfig = true
+    }
+
+    lint {
+        // we use Timber logs rn only for alarms on debug builds
+        disable += "LogNotTimber"
     }
     packaging {
         resources {
@@ -136,6 +143,8 @@ dependencies {
     implementation(libs.hilt.android) //for hilt https://developer.android.com/training/dependency-injection/hilt-android
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+
+    implementation(libs.timber)
 
 
 //    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")

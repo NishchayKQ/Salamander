@@ -8,11 +8,17 @@ import android.media.RingtoneManager
 import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
 import nish.wry.salamander.data.Priority
+import nish.wry.salamander.scheduler.FileLoggingTree
+import timber.log.Timber
 
 @HiltAndroidApp
 class SalamanderApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        if (BuildConfig.DEBUG){
+            Timber.plant(FileLoggingTree(applicationContext))
+        }
 
         // create notification channels our app will use
         createNotificationChannel()
